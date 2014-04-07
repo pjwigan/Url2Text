@@ -1,0 +1,5 @@
+Url2Text
+Copyright 2014 Codealot Limited
+
+This product includes software developed by The Apache Software
+Foundation (http://www.apache.org/).
