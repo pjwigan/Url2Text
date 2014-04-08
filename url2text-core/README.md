@@ -26,15 +26,18 @@ Usage
 Basic use is:
 
     import com.codealot.url2text.Url2Text;
+    import com.codealot.url2text.Url2TextException;
     import com.codealot.url2text.Url2TextResponse;    
     ...
-    try {
-      Url2Text fetch = new Url2Text();
-      // configure fetch here ... 
-      Url2TextResponse response = fetch.contentAsText("http://example.com");
-      if (response.getStatus() == 200) {
-        return response.toJson();
-      }
+    Url2Text fetch = new Url2Text();
+    try {      
+        fetch.setJavascriptEnabled(true);
+        fetch.setIncludeHeaders(true);
+        ...
+        Url2TextResponse response = fetch.contentAsText("http://example.com");
+        if (response.getStatus() == 200) {
+            return response.toJson();
+        }
     } catch (Url2TextException e) {
         ...
     }

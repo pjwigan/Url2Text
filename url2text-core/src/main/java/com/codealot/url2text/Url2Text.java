@@ -45,8 +45,39 @@ import com.gargoylesoftware.htmlunit.xml.XmlPage;
  * <p>
  * Note: not thread safe. Intended to be used in a single thread.
  * <p>
- * For usage see {@link #main(String[])}.
+ * Basic use is:
+ * <code>
+    import com.codealot.url2text.Url2Text;
+    import com.codealot.url2text.Url2TextException;
+    import com.codealot.url2text.Url2TextResponse;    
+    ...
+    Url2Text fetch = new Url2Text();
+    try {        
+        fetch.setJavascriptEnabled(true);
+        fetch.setIncludeHeaders(true);
+        fetch.setIncludeMetadata(true);
+        ...
+        Url2TextResponse response = fetch.contentAsText("http://example.com");
+        if (response.getStatus() == 200) {
+            return response.toJson();
+        }
+    } catch (Url2TextException e) {
+        ...
+    }
+ * </code>
  * <p>
+ * The `Url2TextResponse` object is a POJO encapsulating the fetched text, 
+ * metadata, headers, etc.  
+ * <p>
+ * Currently Url2Text emulates FireFox.  (This project was inspired by a 
+ * need to act as a proxy for a human user). 
+ * <p>
+ * Most of the HtmlUnit <pre>WebClientOptions</pre> and <pre>CookieManager</pre>
+ *  features are exposed as properties of the Url2Text class.  Headers can also
+ *  be added to the <pre>WebRequest</pre>.
+ * <p>
+ * No transient state is stored in the <pre>Url2Text</pre> instance, so they 
+ * can be reused safely.
  * 
  * @author jacobsp
  *         <p>
@@ -121,8 +152,7 @@ public class Url2Text
     /**
      * Configure a WebClient using internal state.
      * 
-     * @param webClient
-     * @return
+     * @return the configured WebClient
      */
     private WebClient prepareWebClient()
     {
@@ -171,7 +201,7 @@ public class Url2Text
      * Determine if a page contains docbook content.
      * 
      * @param page
-     * @return
+     * @return boolean flag
      */
     private boolean isDocbook(final Page page)
     {
@@ -207,12 +237,13 @@ public class Url2Text
      * 
      * @param requestUrl
      * @param additionalHeaders
-     * @return
+     * @return a response object
      * @throws Url2TextException
      */
-    public Url2TextResponse contentAsText(final String requestUrl,
+    public Url2TextResponse contentAsText(
+            final String requestUrl,
             final Map<String, String> additionalHeaders)
-            throws Url2TextException
+                    throws Url2TextException
     {
         try
         {
@@ -226,13 +257,14 @@ public class Url2Text
     }
 
     /**
-     * Construct a WebRequest and add any additinal headers.
+     * Construct a WebRequest and add any additional headers.
      * 
      * @param requestUrl
      * @param additionalHeaders
-     * @return
+     * @return the configured WebRequest
      */
-    private WebRequest prepareRequest(final URL requestUrl,
+    private WebRequest prepareRequest(
+            final URL requestUrl,
             final Map<String, String> additionalHeaders)
     {
         WebRequest request = new WebRequest(requestUrl, HttpMethod.GET);
@@ -378,7 +410,8 @@ public class Url2Text
      * @param tikaMetadata
      * @param response
      */
-    private void addMetadataToResponse(final Metadata tikaMetadata,
+    private void addMetadataToResponse(
+            final Metadata tikaMetadata,
             final Url2TextResponse response)
     {
         final List<NameAndValue> localHeaders = new ArrayList<>();
@@ -406,10 +439,12 @@ public class Url2Text
      * @param requestUrl
      * @param page
      * @param includeHeaders
-     * @return
+     * @return populated response
      */
-    private Url2TextResponse buildResponse(final URL requestUrl,
-            final Page page, final boolean includeHeaders)
+    private Url2TextResponse buildResponse(
+            final URL requestUrl,
+            final Page page, 
+            final boolean includeHeaders)
     {
         final Url2TextResponse response = new Url2TextResponse();
 
@@ -448,7 +483,7 @@ public class Url2Text
         return response;
     }
 
-    public boolean activeXNative()
+    public boolean hasActiveXNative()
     {
         return this.activeXNative;
     }
@@ -459,7 +494,7 @@ public class Url2Text
         LOG.debug("ActiveX enabled: {}", activeXNative);
     }
 
-    public boolean appletEnabled()
+    public boolean hasAppletEnabled()
     {
         return appletEnabled;
     }
@@ -470,7 +505,7 @@ public class Url2Text
         LOG.debug("Applets enabled: {}", appletEnabled);
     }
 
-    public boolean geolocationEnabled()
+    public boolean hasGeolocationEnabled()
     {
         return this.geolocationEnabled;
     }
@@ -481,7 +516,7 @@ public class Url2Text
         LOG.debug("Geolocation enabled: {}", geolocationEnabled);
     }
 
-    public boolean exceptionOnScriptError()
+    public boolean hasExceptionOnScriptError()
     {
         return this.exceptionOnScriptError;
     }
@@ -492,7 +527,7 @@ public class Url2Text
         LOG.debug("Exception on script error: {}", exceptionOnScriptError);
     }
 
-    public boolean exceptionOnFailingStatusCode()
+    public boolean hasExceptionOnFailingStatusCode()
     {
         return this.exceptionOnFailingStatusCode;
     }
@@ -505,7 +540,7 @@ public class Url2Text
                 exceptionOnFailingStatusCode);
     }
 
-    public boolean printContentOnFailingStatusCode()
+    public boolean hasPprintContentOnFailingStatusCode()
     {
         return this.printContentOnFailingStatusCode;
     }
@@ -518,7 +553,7 @@ public class Url2Text
                 printContentOnFailingStatusCode);
     }
 
-    public boolean cssEnabled()
+    public boolean hasCssEnabled()
     {
         return this.cssEnabled;
     }
@@ -529,7 +564,7 @@ public class Url2Text
         LOG.debug("CSS enabled: {}", cssEnabled);
     }
 
-    public boolean doNotTrackEnabled()
+    public boolean hasDoNotTrackEnabled()
     {
         return this.doNotTrackEnabled;
     }
@@ -540,7 +575,7 @@ public class Url2Text
         LOG.debug("Do not track enabled: {}", doNotTrackEnabled);
     }
 
-    public boolean javascriptEnabled()
+    public boolean hasJavascriptEnabled()
     {
         return this.javascriptEnabled;
     }
@@ -551,7 +586,7 @@ public class Url2Text
         LOG.debug("Javascript enabled: {}", javascriptEnabled);
     }
 
-    public boolean popupBlockerEnabled()
+    public boolean hasPopupBlockerEnabled()
     {
         return this.popupBlockerEnabled;
     }
@@ -562,7 +597,7 @@ public class Url2Text
         LOG.debug("Popup blocker enabled: {}", popupBlockerEnabled);
     }
 
-    public boolean redirectEnabled()
+    public boolean hasRedirectEnabled()
     {
         return this.redirectEnabled;
     }
@@ -573,7 +608,7 @@ public class Url2Text
         LOG.debug("Redirect enabled: {}", redirectEnabled);
     }
 
-    public boolean useInsecureSSL()
+    public boolean hasUseInsecureSSL()
     {
         return this.useInsecureSSL;
     }
@@ -584,7 +619,7 @@ public class Url2Text
         LOG.debug("Insecure SSL: {}", useInsecureSSL);
     }
 
-    public boolean cookiesEnabled()
+    public boolean hasCookiesEnabled()
     {
         return this.cookiesEnabled;
     }
@@ -595,7 +630,7 @@ public class Url2Text
         LOG.debug("Cookies enabled: {}", cookiesEnabled);
     }
 
-    public boolean clearCookies()
+    public boolean hasClearCookies()
     {
         return this.clearCookies;
     }
@@ -606,7 +641,7 @@ public class Url2Text
         LOG.debug("Clear all cookies: {}", clearCookies);
     }
 
-    public boolean clearExpiredCookies()
+    public boolean hasClearExpiredCookies()
     {
         return this.clearExpiredCookies;
     }
@@ -649,7 +684,7 @@ public class Url2Text
         LOG.debug("Timeout (seconds): {}", seconds);
     }
 
-    public boolean includeHeaders()
+    public boolean hasIncludeHeaders()
     {
         return this.includeHeaders;
     }
@@ -666,7 +701,7 @@ public class Url2Text
         LOG.debug("Include headers: {}", includeHeaders);
     }
 
-    public boolean includeMetadata()
+    public boolean hasIncludeMetadata()
     {
         return this.includeMetadata;
     }

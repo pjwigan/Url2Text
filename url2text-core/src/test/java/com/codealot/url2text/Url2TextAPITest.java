@@ -13,135 +13,135 @@ public class Url2TextAPITest
     public void testSetActiveXNative()
     {
         // check default, then change
-        assertFalse(this.fetcher.activeXNative());
+        assertFalse(this.fetcher.hasActiveXNative());
         this.fetcher.setActiveXNative(true);
-        assertTrue(this.fetcher.activeXNative());
+        assertTrue(this.fetcher.hasActiveXNative());
     }
 
     @Test
     public void testSetAppletEnabled()
     {
         // check default, then change
-        assertFalse(this.fetcher.appletEnabled());
+        assertFalse(this.fetcher.hasAppletEnabled());
         this.fetcher.setAppletEnabled(true);
-        assertTrue(this.fetcher.appletEnabled());
+        assertTrue(this.fetcher.hasAppletEnabled());
     }
 
     @Test
     public void testSetGeolocationEnabled()
     {
         // check default, then change
-        assertFalse(this.fetcher.geolocationEnabled());
+        assertFalse(this.fetcher.hasGeolocationEnabled());
         this.fetcher.setGeolocationEnabled(true);
-        assertTrue(this.fetcher.geolocationEnabled());
+        assertTrue(this.fetcher.hasGeolocationEnabled());
     }
 
     @Test
     public void testSetExceptionOnScriptError()
     {
         // check default, then change
-        assertFalse(this.fetcher.exceptionOnScriptError());
+        assertFalse(this.fetcher.hasExceptionOnScriptError());
         this.fetcher.setExceptionOnScriptError(true);
-        assertTrue(this.fetcher.exceptionOnScriptError());
+        assertTrue(this.fetcher.hasExceptionOnScriptError());
     }
 
     @Test
     public void testSetExceptionOnFailingStatusCode()
     {
         // check default, then change
-        assertFalse(this.fetcher.exceptionOnFailingStatusCode());
+        assertFalse(this.fetcher.hasExceptionOnFailingStatusCode());
         this.fetcher.setExceptionOnFailingStatusCode(true);
-        assertTrue(this.fetcher.exceptionOnFailingStatusCode());
+        assertTrue(this.fetcher.hasExceptionOnFailingStatusCode());
     }
 
     @Test
     public void testSetPrintContentOnFailingStatusCode()
     {
         // check default, then change
-        assertFalse(this.fetcher.printContentOnFailingStatusCode());
+        assertFalse(this.fetcher.hasPprintContentOnFailingStatusCode());
         this.fetcher.setPrintContentOnFailingStatusCode(true);
-        assertTrue(this.fetcher.printContentOnFailingStatusCode());
+        assertTrue(this.fetcher.hasPprintContentOnFailingStatusCode());
     }
 
     @Test
     public void testSetCssEnabled()
     {
         // check default, then change
-        assertFalse(this.fetcher.cssEnabled());
+        assertFalse(this.fetcher.hasCssEnabled());
         this.fetcher.setCssEnabled(true);
-        assertTrue(this.fetcher.cssEnabled());
+        assertTrue(this.fetcher.hasCssEnabled());
     }
 
     @Test
     public void testSetDoNotTrackEnabled()
     {
         // check default, then change
-        assertFalse(this.fetcher.doNotTrackEnabled());
+        assertFalse(this.fetcher.hasDoNotTrackEnabled());
         this.fetcher.setDoNotTrackEnabled(true);
-        assertTrue(this.fetcher.doNotTrackEnabled());
+        assertTrue(this.fetcher.hasDoNotTrackEnabled());
     }
 
     @Test
     public void testSetJavascriptEnabled()
     {
         // check default, then change
-        assertFalse(this.fetcher.javascriptEnabled());
+        assertFalse(this.fetcher.hasJavascriptEnabled());
         this.fetcher.setJavascriptEnabled(true);
-        assertTrue(this.fetcher.javascriptEnabled());
+        assertTrue(this.fetcher.hasJavascriptEnabled());
     }
 
     @Test
     public void testSetPopupBlockerEnabled()
     {
         // check default, then change
-        assertTrue(this.fetcher.popupBlockerEnabled());
+        assertTrue(this.fetcher.hasPopupBlockerEnabled());
         this.fetcher.setPopupBlockerEnabled(false);
-        assertFalse(this.fetcher.popupBlockerEnabled());
+        assertFalse(this.fetcher.hasPopupBlockerEnabled());
     }
 
     @Test
     public void testSetRedirectEnabled()
     {
         // check default, then change
-        assertTrue(this.fetcher.redirectEnabled());
+        assertTrue(this.fetcher.hasRedirectEnabled());
         this.fetcher.setRedirectEnabled(false);
-        assertFalse(this.fetcher.redirectEnabled());
+        assertFalse(this.fetcher.hasRedirectEnabled());
     }
 
     @Test
     public void testSetUseInsecureSSL()
     {
         // check default, then change
-        assertFalse(this.fetcher.useInsecureSSL());
+        assertFalse(this.fetcher.hasUseInsecureSSL());
         this.fetcher.setUseInsecureSSL(true);
-        assertTrue(this.fetcher.useInsecureSSL());
+        assertTrue(this.fetcher.hasUseInsecureSSL());
     }
 
     @Test
     public void testSetCookiesEnabled()
     {
         // check default, then change
-        assertTrue(this.fetcher.cookiesEnabled());
+        assertTrue(this.fetcher.hasCookiesEnabled());
         this.fetcher.setCookiesEnabled(false);
-        assertFalse(this.fetcher.cookiesEnabled());
+        assertFalse(this.fetcher.hasCookiesEnabled());
     }
 
     @Test
     public void testSetClearCookies()
     {
         // check default, then change
-        assertTrue(this.fetcher.clearCookies());
+        assertTrue(this.fetcher.hasClearCookies());
         this.fetcher.setClearCookies(false);
-        assertFalse(this.fetcher.clearCookies());
+        assertFalse(this.fetcher.hasClearCookies());
     }
 
     @Test
     public void testSetClearExpiredCookies()
     {
         // check default, then change
-        assertTrue(this.fetcher.clearExpiredCookies());
+        assertTrue(this.fetcher.hasClearExpiredCookies());
         this.fetcher.setClearExpiredCookies(false);
-        assertFalse(this.fetcher.clearExpiredCookies());
+        assertFalse(this.fetcher.hasClearExpiredCookies());
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -165,18 +165,18 @@ public class Url2TextAPITest
     public void testSetIncludeHeaders()
     {
         // check default, then change
-        assertFalse(this.fetcher.includeHeaders());
+        assertFalse(this.fetcher.hasIncludeHeaders());
         this.fetcher.setIncludeHeaders(true);
-        assertTrue(this.fetcher.includeHeaders());
+        assertTrue(this.fetcher.hasIncludeHeaders());
     }
 
     @Test
     public void testSetIncludeMetadata()
     {
         // check default, then change
-        assertFalse(this.fetcher.includeMetadata());
+        assertFalse(this.fetcher.hasIncludeMetadata());
         this.fetcher.setIncludeMetadata(true);
-        assertTrue(this.fetcher.includeMetadata());
+        assertTrue(this.fetcher.hasIncludeMetadata());
     }
 
     @Test
