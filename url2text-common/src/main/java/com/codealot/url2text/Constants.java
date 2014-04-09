@@ -25,7 +25,6 @@ package com.codealot.url2text;
  */
 public class Constants
 {
-
     public static final String APP_VERSION = "0.5.0";
 
     // *_NOT_SET indicators, used as initialisers.
@@ -52,7 +51,8 @@ public class Constants
     public static final String STATUS_MESSAGE = "Status-Message";
     public static final String TRANSACTION_METADATA = "Transaction-Metadata";
 
-    // Url2Text.class property labels
+    // Url2Text.class System property labels.  Also used as GET params (length
+    // irrelevant as not intended to be typed).
     public static final String ACTIVEX_NATIVE = "url2text.activeXNative";
     public static final String APPLET_ENABLED = "url2text.appletEnabled";
     public static final String GEOLOCATION_ENABLED = "url2text.geolocationEnabled";
@@ -73,7 +73,10 @@ public class Constants
     public static final String NETWORK_TIMEOUT = "url2text.networkTimeout";
     public static final String JAVASCRIPT_TIMEOUT = "url2text.javascriptTimeout";
     public static final String MAX_CONTENT_LENGTH = "url2text.maxContentLength";
+    // GET only param
+    public static final String REQUEST_URL = "url2text.requestUrl";
     
+    // Collection of Url2Text.class property labels (i.e. GET params excluded)
     public static final String[] URL2TEXT_PROPERTY_KEYS = {
         ACTIVEX_NATIVE,
         APPLET_ENABLED,
@@ -96,7 +99,10 @@ public class Constants
         JAVASCRIPT_TIMEOUT,
         MAX_CONTENT_LENGTH
     };
-
+    
+    // Default name of property file.  Also used as System property key.
+    public static final String URL2TEXT_PROPERTIES = "url2text.properties";
+    
     // other constants
     public static final String UTF_8 = "UTF-8";
 
