@@ -1,7 +1,7 @@
 package com.codealot.url2text;
 
 /**
- * Root of exceptions thrown by Url2Text.
+ * Only exception thrown by Url2Text classes.
  * 
  * @author jacobsp
  * 

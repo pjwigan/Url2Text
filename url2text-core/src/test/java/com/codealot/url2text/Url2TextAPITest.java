@@ -1,13 +1,54 @@
 package com.codealot.url2text;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
+import java.util.Properties;
 
 import org.junit.Test;
 
 public class Url2TextAPITest
 {
-
     private Url2Text fetcher = new Url2Text();
+    
+    
+    @Test(expected = NullPointerException.class)
+    public void testPropertiesNull() 
+    {
+        new Url2Text(null);
+    }
+    
+    @Test
+    public void testPropertiesEmpty() 
+    {
+        assertEquals(fetcher, new Url2Text(new Properties()));
+    }
+        
+    @Test
+    public void testDefaults() 
+    {
+        assertEquals(fetcher.hasActiveXNative(), false);
+        assertEquals(fetcher.hasAppletEnabled(), false);
+        assertEquals(fetcher.hasGeolocationEnabled(), false);
+        assertEquals(fetcher.hasPopupBlockerEnabled(), true);
+        assertEquals(fetcher.hasExceptionOnScriptError(), false);
+        assertEquals(fetcher.hasExceptionOnFailingStatusCode(), false);
+        assertEquals(fetcher.hasPrintContentOnFailingStatusCode(), false);
+        assertEquals(fetcher.hasCssEnabled(), false);
+        assertEquals(fetcher.hasDoNotTrackEnabled(), false);
+        assertEquals(fetcher.hasJavascriptEnabled(), false);
+        assertEquals(fetcher.hasUseInsecureSSL(), false);
+        assertEquals(fetcher.hasRedirectEnabled(), true);
+        assertEquals(fetcher.hasCookiesEnabled(), true);
+        assertEquals(fetcher.hasClearCookies(), true);
+        assertEquals(fetcher.hasClearExpiredCookies(), true);
+        assertEquals(fetcher.hasIncludeHeaders(), false);
+        assertEquals(fetcher.hasIncludeMetadata(), false);
+        assertEquals(fetcher.getNetworkTimeout(), 90);
+        assertEquals(fetcher.getJavascriptTimeout(), 20);
+        assertEquals(fetcher.getMaxContentLength(), 1_024 * 1_024);
+    }
 
     @Test
     public void testSetActiveXNative()
@@ -58,9 +99,9 @@ public class Url2TextAPITest
     public void testSetPrintContentOnFailingStatusCode()
     {
         // check default, then change
-        assertFalse(this.fetcher.hasPprintContentOnFailingStatusCode());
+        assertFalse(this.fetcher.hasPrintContentOnFailingStatusCode());
         this.fetcher.setPrintContentOnFailingStatusCode(true);
-        assertTrue(this.fetcher.hasPprintContentOnFailingStatusCode());
+        assertTrue(this.fetcher.hasPrintContentOnFailingStatusCode());
     }
 
     @Test

@@ -6,7 +6,7 @@ import static com.codealot.url2text.Constants.*;
  * Avoids a heavyweight dependency.
  * <p>
  * The getters will never return null. If name or value have not been set, their
- * getters will return "*not-set*".
+ * getters will return Contants.STR_NOT_SET.
  * <p>
  * 
  * @author jacobsp
@@ -29,22 +29,27 @@ import static com.codealot.url2text.Constants.*;
  */
 public class NameAndValue
 {
-
     private String name = STR_NOT_SET;
     private String value = STR_NOT_SET;
 
+    
     public NameAndValue()
     {
         // default
     }
 
-    public NameAndValue(final String key, final String value)
+    public NameAndValue(final String name, final String value)
     {
-        this.setKey(key);
+        this.setName(name);
         this.setValue(value);
     }
 
-    public String getKey()
+    /**
+     * Note: null is never returned but the empty string might be.
+     * 
+     * @return the name
+     */
+    public String getName()
     {
         return this.name;
     }
@@ -54,11 +59,16 @@ public class NameAndValue
      * 
      * @param name
      */
-    public void setKey(final String key)
+    public void setName(final String name)
     {
-        this.name = (key == null) ? "" : key;
+        this.name = (name == null) ? "" : name;
     }
 
+    /**
+     * Note: null is never returned but the empty string might be.
+     * 
+     * @return the value
+     */
     public String getValue()
     {
         return this.value;

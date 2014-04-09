@@ -20,6 +20,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * Class to encapsulate the result of fetching and converting a url's content.
+ * Consists of a bunch of properties plus asFormat(), toString() and toJson() 
+ * methods.
  * 
  * <p>
  * Note: getters will never return null.
@@ -262,7 +264,7 @@ public class Url2TextResponse implements Serializable
 
         for (final NameAndValue nameAndValue : array)
         {
-            jsonGenerator.writeStringField(nameAndValue.getKey(),
+            jsonGenerator.writeStringField(nameAndValue.getName(),
                     nameAndValue.getValue());
         }
         jsonGenerator.writeEndObject();
@@ -296,7 +298,7 @@ public class Url2TextResponse implements Serializable
             buffer.append("################ RESPONSE HEADERS ####################\n");
             for (final NameAndValue kvp : responseHeaders)
             {
-                buffer.append(kvp.getKey()).append(" = ")
+                buffer.append(kvp.getName()).append(" = ")
                         .append(kvp.getValue()).append('\n');
             }
             buffer.append('\n');
@@ -308,7 +310,7 @@ public class Url2TextResponse implements Serializable
 
             for (final NameAndValue kvp : contentMetadata)
             {
-                buffer.append(kvp.getKey()).append(" = ")
+                buffer.append(kvp.getName()).append(" = ")
                         .append(kvp.getValue()).append('\n');
             }
             buffer.append('\n');

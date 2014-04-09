@@ -38,6 +38,7 @@
 		<module>url2text-common</module>
 		<module>url2text-core</module>
 		<module>url2text-cli</module>
+		<module>url2text-servlet</module>
 	</modules>
 
 	<properties>
@@ -47,6 +48,7 @@
 
 		<!-- Dependency version properties -->
 		<jackson.version>2.3.2</jackson.version>
+		<javax.servlet.version>3.0.1</javax.servlet.version>
 		<junit.version>4.11</junit.version>
 		<slf4j.version>1.7.6</slf4j.version>
 		<tika.version>1.5</tika.version>

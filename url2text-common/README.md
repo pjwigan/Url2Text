@@ -19,17 +19,17 @@ The cloned code can either be built using `mvn package` or imported into Eclipse
 
 Usage
 -----
-### Constants
+### Class: Constants
 Static Strings and enums referenced by the other classes.
 
-### NameAndValue
-A simple `<String, String>` implementation that allows duplicate names.
+### Class: NameAndValue
+A simple `<String, String>` implementation that allows duplicate names in lists..
 
-### Url2TextException
+### Class: Url2TextException
 Url2Text classes only throw instances of this exception.  
 
-### Url2TextResponse
-Encapsulates the response data, plus `toJson` and `toString()` methods for JSON and plain text output respectively.
+### Class: Url2TextResponse
+Encapsulates the response data, plus `toJson()` and `toString()` methods for JSON and plain text output respectively.
 
 
 LICENSE
