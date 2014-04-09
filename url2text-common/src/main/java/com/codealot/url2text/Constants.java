@@ -53,26 +53,49 @@ public class Constants
     public static final String TRANSACTION_METADATA = "Transaction-Metadata";
 
     // Url2Text.class property labels
-    public static final String ACTIVEX_NATIVE = "activeXNative";
-    public static final String APPLET_ENABLED = "appletEnabled";
-    public static final String GEOLOCATION_ENABLED = "geolocationEnabled";
-    public static final String POPUP_BLOCKER_ENABLED = "popupBlockerEnabled";
-    public static final String EXCEPTION_ON_SCRIPT_ERROR = "exceptionOnScriptError";
-    public static final String EXCEPTION_ON_FAILING_STATUS = "exceptionOnFailingStatusCode";
-    public static final String PRINT_CONTENT_ON_FAILING_STATUS = "printContentOnFailingStatusCode";
-    public static final String CSS_ENABLED = "cssEnabled";
-    public static final String DO_NOT_TRACK_ENABLED = "doNotTrackEnabled";
-    public static final String JAVASCRIPT_ENABLED = "javascriptEnabled";
-    public static final String USE_INSECURE_SSL = "useInsecureSSL";
-    public static final String REDIRECT_ENABLED = "redirectEnabled";
-    public static final String COOKIES_ENABLED = "cookiesEnabled";
-    public static final String CLEAR_COOKIES = "clearCookies";
-    public static final String CLEAR_EXPIRED_COOKIES = "clearExpiredCookies";
-    public static final String INCLUDE_HEADERS = "includeHeaders";
-    public static final String INCLUDE_METADATA = "includeMetadata";
-    public static final String NETWORK_TIMEOUT = "networkTimeout";
-    public static final String JAVASCRIPT_TIMEOUT = "javascriptTimeout";
-    public static final String MAX_CONTENT_LENGTH = "maxContentLength";
+    public static final String ACTIVEX_NATIVE = "url2text.activeXNative";
+    public static final String APPLET_ENABLED = "url2text.appletEnabled";
+    public static final String GEOLOCATION_ENABLED = "url2text.geolocationEnabled";
+    public static final String POPUP_BLOCKER_ENABLED = "url2text.popupBlockerEnabled";
+    public static final String EXCEPTION_ON_SCRIPT_ERROR = "url2text.exceptionOnScriptError";
+    public static final String EXCEPTION_ON_FAILING_STATUS = "url2text.exceptionOnFailingStatus";
+    public static final String PRINT_CONTENT_ON_FAILING_STATUS = "url2text.printContentOnFailingStatus";
+    public static final String CSS_ENABLED = "url2text.cssEnabled";
+    public static final String DO_NOT_TRACK_ENABLED = "url2text.doNotTrackEnabled";
+    public static final String JAVASCRIPT_ENABLED = "url2text.javascriptEnabled";
+    public static final String USE_INSECURE_SSL = "url2text.useInsecureSSL";
+    public static final String REDIRECT_ENABLED = "url2text.redirectEnabled";
+    public static final String COOKIES_ENABLED = "url2text.cookiesEnabled";
+    public static final String CLEAR_COOKIES = "url2text.clearCookies";
+    public static final String CLEAR_EXPIRED_COOKIES = "url2text.clearExpiredCookies";
+    public static final String INCLUDE_HEADERS = "url2text.includeHeaders";
+    public static final String INCLUDE_METADATA = "url2text.includeMetadata";
+    public static final String NETWORK_TIMEOUT = "url2text.networkTimeout";
+    public static final String JAVASCRIPT_TIMEOUT = "url2text.javascriptTimeout";
+    public static final String MAX_CONTENT_LENGTH = "url2text.maxContentLength";
+    
+    public static final String[] URL2TEXT_PROPERTY_KEYS = {
+        ACTIVEX_NATIVE,
+        APPLET_ENABLED,
+        GEOLOCATION_ENABLED,
+        POPUP_BLOCKER_ENABLED,
+        EXCEPTION_ON_SCRIPT_ERROR,
+        EXCEPTION_ON_FAILING_STATUS,
+        PRINT_CONTENT_ON_FAILING_STATUS,
+        CSS_ENABLED,
+        DO_NOT_TRACK_ENABLED,
+        JAVASCRIPT_ENABLED,
+        USE_INSECURE_SSL,
+        REDIRECT_ENABLED,
+        COOKIES_ENABLED,
+        CLEAR_COOKIES,
+        CLEAR_EXPIRED_COOKIES,
+        INCLUDE_HEADERS,
+        INCLUDE_METADATA,
+        NETWORK_TIMEOUT,
+        JAVASCRIPT_TIMEOUT,
+        MAX_CONTENT_LENGTH
+    };
 
     // other constants
     public static final String UTF_8 = "UTF-8";

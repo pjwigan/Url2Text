@@ -38,7 +38,6 @@
 		<module>url2text-common</module>
 		<module>url2text-core</module>
 		<module>url2text-cli</module>
-		<module>url2text-servlet</module>
 	</modules>
 
 	<properties>

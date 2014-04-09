@@ -6,7 +6,9 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.Enumeration;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -72,32 +74,17 @@ import com.gargoylesoftware.htmlunit.xml.XmlPage;
  * Currently Url2Text emulates FireFox. (This project was inspired by a need to
  * act as a proxy for a human user).
  * <p>
- * Most of the HtmlUnit
- * 
- * <pre>
- * WebClientOptions
- * </pre>
- * 
- * and
- * 
- * <pre>
- * CookieManager
- * </pre>
- * 
- * features are exposed as properties of the Url2Text class. Headers can also be
- * added to the
- * 
- * <pre>
- * WebRequest
- * </pre>.
+ * Most of the HtmlUnit WebClientOptions and CookieManager features are exposed
+ * as properties of the Url2Text class. Headers can also be added to the 
+ * WebRequest.
  * <p>
- * No transient state is stored in the
- * 
- * <pre>
- * Url2Text
- * </pre>
- * 
- * instance, so they can be reused safely.
+ * No transient state is stored in the Url2Text instance, so they can be reused
+ * safely.
+ * <p>
+ * Configuration can be saved to a Properties file using the {@link #configAsProperties()}
+ * method.  There is a constructore that accepts Properties for rapid configuration.
+ * Also System properties can be given as override.  See the Constants class for
+ * available keys.
  * 
  * @author jacobsp
  *         <p>
@@ -136,7 +123,7 @@ public class Url2Text
     // FUTURE use reflection to ensure all properties are tested.
 
     // Number of configurable properties
-    private static int PROPERTY_COUNT = 20;
+    private static int PROPERTY_COUNT = URL2TEXT_PROPERTY_KEYS.length;
 
     // HtmlUnit WebClientOptions (not set by the CLI)
     private boolean activeXNative = false;
@@ -144,8 +131,8 @@ public class Url2Text
     private boolean geolocationEnabled = false;
     private boolean popupBlockerEnabled = true;
     private boolean exceptionOnScriptError = false;
-    private boolean exceptionOnFailingStatusCode = false;
-    private boolean printContentOnFailingStatusCode = false;
+    private boolean exceptionOnFailingStatus = false;
+    private boolean printContentOnFailingStatus = false;
 
     // HtmlUnit WebClientOptions (set by the CLI)
     private boolean cssEnabled = false;
@@ -178,26 +165,39 @@ public class Url2Text
      */
     public Url2Text()
     {
-        // default
+        this(null);
     };
 
     /**
      * Constructor that accepts a Properties instance to configure the defaults.
      * <p>
-     * Only settings that vary from the defaults need to be present.
-     * <p>
-     * An empty Properties instance is valid but a null is not.  
+     * Only settings that vary from the defaults need to be present. Can be
+     * null or empty
      * 
-     * @param properties
+     * @param properties can be null or empty
      */
     public Url2Text(Properties properties)
     {
-        Objects.requireNonNull(properties, "No Properties supplied.");
+        if (properties == null) {
+            properties = new Properties();
+        }
 
         if (properties.size() > PROPERTY_COUNT)
         {
             throw new IllegalArgumentException("Too many properties. Expected "
                     + PROPERTY_COUNT + " but have " + properties.size());
+        }
+        
+        // apply system properties, if any
+        for (Enumeration<Object> e = System.getProperties().keys(); e.hasMoreElements(); ) 
+        {
+            String key = e.nextElement().toString();
+            String value = System.getProperty(key);
+            
+            if (Arrays.asList(URL2TEXT_PROPERTY_KEYS).contains(key)) 
+            {
+                properties.put(key, value);
+            }
         }
 
         String activeXNative = properties.getProperty(ACTIVEX_NATIVE, Boolean
@@ -214,10 +214,10 @@ public class Url2Text
                 Boolean.valueOf(this.exceptionOnScriptError).toString());
         String exceptionOnFailingStatusCode = properties.getProperty(
                 EXCEPTION_ON_FAILING_STATUS,
-                Boolean.valueOf(this.exceptionOnFailingStatusCode).toString());
+                Boolean.valueOf(this.exceptionOnFailingStatus).toString());
         String printContentOnFailingStatusCode = properties.getProperty(
                 PRINT_CONTENT_ON_FAILING_STATUS,
-                Boolean.valueOf(this.printContentOnFailingStatusCode)
+                Boolean.valueOf(this.printContentOnFailingStatus)
                         .toString());
         String cssEnabled = properties.getProperty(CSS_ENABLED, Boolean
                 .valueOf(this.cssEnabled).toString());
@@ -252,9 +252,9 @@ public class Url2Text
         setGeolocationEnabled(Boolean.valueOf(geolocationEnabled));
         setPopupBlockerEnabled(Boolean.valueOf(popupBlockerEnabled));
         setExceptionOnScriptError(Boolean.valueOf(exceptionOnScriptError));
-        setExceptionOnFailingStatusCode(Boolean
+        setExceptionOnFailingStatus(Boolean
                 .valueOf(exceptionOnFailingStatusCode));
-        setPrintContentOnFailingStatusCode(Boolean
+        setPrintContentOnFailingStatus(Boolean
                 .valueOf(printContentOnFailingStatusCode));
         setCssEnabled(Boolean.valueOf(cssEnabled));
         setDoNotTrackEnabled(Boolean.valueOf(doNotTrackEnabled));
@@ -295,9 +295,9 @@ public class Url2Text
         properties.setProperty(EXCEPTION_ON_SCRIPT_ERROR,
                 Boolean.valueOf(this.exceptionOnScriptError).toString());
         properties.setProperty(EXCEPTION_ON_FAILING_STATUS,
-                Boolean.valueOf(this.exceptionOnFailingStatusCode).toString());
+                Boolean.valueOf(this.exceptionOnFailingStatus).toString());
         properties.setProperty(PRINT_CONTENT_ON_FAILING_STATUS, Boolean
-                .valueOf(this.printContentOnFailingStatusCode).toString());
+                .valueOf(this.printContentOnFailingStatus).toString());
         properties.setProperty(CSS_ENABLED, Boolean.valueOf(this.cssEnabled)
                 .toString());
         properties.setProperty(DO_NOT_TRACK_ENABLED,
@@ -345,14 +345,14 @@ public class Url2Text
                 this.cookiesEnabled, 
                 this.cssEnabled,
                 this.doNotTrackEnabled, 
-                this.exceptionOnFailingStatusCode, 
+                this.exceptionOnFailingStatus, 
                 this.exceptionOnScriptError,
                 this.geolocationEnabled, 
                 this.includeHeaders, 
                 this.includeMetadata,
                 this.javascriptEnabled, 
                 this.popupBlockerEnabled,
-                this.printContentOnFailingStatusCode,
+                this.printContentOnFailingStatus,
                 this.redirectEnabled,
                 this.useInsecureSSL,
                 this.networkTimeout,
@@ -399,9 +399,9 @@ public class Url2Text
         options.setGeolocationEnabled(this.geolocationEnabled);
         options.setJavaScriptEnabled(this.javascriptEnabled);
         options.setPopupBlockerEnabled(this.popupBlockerEnabled);
-        options.setPrintContentOnFailingStatusCode(this.printContentOnFailingStatusCode);
+        options.setPrintContentOnFailingStatusCode(this.printContentOnFailingStatus);
         options.setRedirectEnabled(this.redirectEnabled);
-        options.setThrowExceptionOnFailingStatusCode(this.exceptionOnFailingStatusCode);
+        options.setThrowExceptionOnFailingStatusCode(this.exceptionOnFailingStatus);
         options.setThrowExceptionOnScriptError(this.exceptionOnScriptError);
         options.setUseInsecureSSL(this.useInsecureSSL);
         options.setTimeout(this.networkTimeout * 1_000);
@@ -749,30 +749,30 @@ public class Url2Text
         LOG.debug("Exception on script error: {}", exceptionOnScriptError);
     }
 
-    public boolean hasExceptionOnFailingStatusCode()
+    public boolean hasExceptionOnFailingStatus()
     {
-        return this.exceptionOnFailingStatusCode;
+        return this.exceptionOnFailingStatus;
     }
 
-    public void setExceptionOnFailingStatusCode(
-            final boolean exceptionOnFailingStatusCode)
+    public void setExceptionOnFailingStatus(
+            final boolean exceptionOnFailingStatus)
     {
-        this.exceptionOnFailingStatusCode = exceptionOnFailingStatusCode;
+        this.exceptionOnFailingStatus = exceptionOnFailingStatus;
         LOG.debug("Exception on failing status code: {}",
-                exceptionOnFailingStatusCode);
+                exceptionOnFailingStatus);
     }
 
-    public boolean hasPrintContentOnFailingStatusCode()
+    public boolean hasPrintContentOnFailingStatus()
     {
-        return this.printContentOnFailingStatusCode;
+        return this.printContentOnFailingStatus;
     }
 
-    public void setPrintContentOnFailingStatusCode(
-            final boolean printContentOnFailingStatusCode)
+    public void setPrintContentOnFailingStatus(
+            final boolean printContentOnFailingStatus)
     {
-        this.printContentOnFailingStatusCode = printContentOnFailingStatusCode;
+        this.printContentOnFailingStatus = printContentOnFailingStatus;
         LOG.debug("Print content on failing status code: {}",
-                printContentOnFailingStatusCode);
+                printContentOnFailingStatus);
     }
 
     public boolean hasCssEnabled()

@@ -1,5 +1,7 @@
 package com.codealot.url2text;
 
+import static com.codealot.url2text.Constants.*;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -13,7 +15,7 @@ public class Url2TextAPITest
     private Url2Text fetcher = new Url2Text();
     
     
-    @Test(expected = NullPointerException.class)
+    @Test
     public void testPropertiesNull() 
     {
         new Url2Text(null);
@@ -22,9 +24,45 @@ public class Url2TextAPITest
     @Test
     public void testPropertiesEmpty() 
     {
+        assertEquals(fetcher, new Url2Text(null));
         assertEquals(fetcher, new Url2Text(new Properties()));
     }
+    
+    @Test
+    public void testSystemPropertyOveride() 
+    {
+        try
+        {
+            System.setProperty(ACTIVEX_NATIVE, Boolean.TRUE.toString());
+
+            Url2Text fetcher = new Url2Text();
+            assertTrue(fetcher.hasActiveXNative());
+        }
+        finally
+        {
+            System.getProperties().remove(ACTIVEX_NATIVE);
+        }
+    }
         
+    @Test
+    public void testSystemPropertiesOveride() 
+    {
+        try
+        {
+            System.setProperty(ACTIVEX_NATIVE, Boolean.TRUE.toString());
+
+            Properties properties = new Properties();
+            properties.put(ACTIVEX_NATIVE, Boolean.FALSE.toString());
+
+            Url2Text fetcher = new Url2Text(properties);
+            assertTrue(fetcher.hasActiveXNative());
+        }
+        finally
+        {
+            System.getProperties().remove(ACTIVEX_NATIVE);
+        }
+    }
+
     @Test
     public void testDefaults() 
     {
@@ -33,8 +71,8 @@ public class Url2TextAPITest
         assertEquals(fetcher.hasGeolocationEnabled(), false);
         assertEquals(fetcher.hasPopupBlockerEnabled(), true);
         assertEquals(fetcher.hasExceptionOnScriptError(), false);
-        assertEquals(fetcher.hasExceptionOnFailingStatusCode(), false);
-        assertEquals(fetcher.hasPrintContentOnFailingStatusCode(), false);
+        assertEquals(fetcher.hasExceptionOnFailingStatus(), false);
+        assertEquals(fetcher.hasPrintContentOnFailingStatus(), false);
         assertEquals(fetcher.hasCssEnabled(), false);
         assertEquals(fetcher.hasDoNotTrackEnabled(), false);
         assertEquals(fetcher.hasJavascriptEnabled(), false);
@@ -90,18 +128,18 @@ public class Url2TextAPITest
     public void testSetExceptionOnFailingStatusCode()
     {
         // check default, then change
-        assertFalse(this.fetcher.hasExceptionOnFailingStatusCode());
-        this.fetcher.setExceptionOnFailingStatusCode(true);
-        assertTrue(this.fetcher.hasExceptionOnFailingStatusCode());
+        assertFalse(this.fetcher.hasExceptionOnFailingStatus());
+        this.fetcher.setExceptionOnFailingStatus(true);
+        assertTrue(this.fetcher.hasExceptionOnFailingStatus());
     }
 
     @Test
     public void testSetPrintContentOnFailingStatusCode()
     {
         // check default, then change
-        assertFalse(this.fetcher.hasPrintContentOnFailingStatusCode());
-        this.fetcher.setPrintContentOnFailingStatusCode(true);
-        assertTrue(this.fetcher.hasPrintContentOnFailingStatusCode());
+        assertFalse(this.fetcher.hasPrintContentOnFailingStatus());
+        this.fetcher.setPrintContentOnFailingStatus(true);
+        assertTrue(this.fetcher.hasPrintContentOnFailingStatus());
     }
 
     @Test
