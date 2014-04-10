@@ -12,57 +12,104 @@ import org.junit.Test;
 
 public class Url2TextAPITest
 {
-    private Url2Text fetcher = new Url2Text();
+    private final Url2Text fetcher;
     
+    public Url2TextAPITest() throws Url2TextException 
+    {
+        fetcher = new Url2Text();
+    }    
     
     @Test
-    public void testPropertiesNull() 
+    public void testPropertiesNull() throws Url2TextException 
     {
         new Url2Text(null);
     }
     
     @Test
-    public void testPropertiesEmpty() 
+    public void testPropertiesEmpty() throws Url2TextException 
     {
         assertEquals(fetcher, new Url2Text(null));
         assertEquals(fetcher, new Url2Text(new Properties()));
     }
     
     @Test
-    public void testSystemPropertyOveride() 
+    public void testSystemPropertyOveride() throws Url2TextException 
     {
+        String testKey = KEY_ACTIVEX_NATIVE;
         try
         {
-            System.setProperty(ACTIVEX_NATIVE, Boolean.TRUE.toString());
+            System.setProperty(testKey, Boolean.TRUE.toString());
 
             Url2Text fetcher = new Url2Text();
             assertTrue(fetcher.hasActiveXNative());
         }
         finally
         {
-            System.getProperties().remove(ACTIVEX_NATIVE);
+            System.getProperties().remove(testKey);
         }
     }
         
     @Test
-    public void testSystemPropertiesOveride() 
+    public void testSystemPropertiesOveride() throws Url2TextException 
     {
+        String testKey = KEY_ACTIVEX_NATIVE;
         try
         {
-            System.setProperty(ACTIVEX_NATIVE, Boolean.TRUE.toString());
+            System.setProperty(testKey, Boolean.TRUE.toString());
 
             Properties properties = new Properties();
-            properties.put(ACTIVEX_NATIVE, Boolean.FALSE.toString());
+            properties.put(KEY_ACTIVEX_NATIVE, Boolean.FALSE.toString());
 
             Url2Text fetcher = new Url2Text(properties);
             assertTrue(fetcher.hasActiveXNative());
         }
         finally
         {
-            System.getProperties().remove(ACTIVEX_NATIVE);
+            System.getProperties().remove(testKey);
         }
     }
+    
+    @Test(expected = Url2TextException.class)
+    public void testPropertiesBadValue() throws Url2TextException 
+    {
+        Properties properties = new Properties();
+        properties.put(KEY_ACTIVEX_NATIVE, "bananas");
 
+        new Url2Text(properties);
+    }
+    
+    @Test
+    public void testPropertiesMixedCaseKey() throws Url2TextException 
+    {
+        Properties properties = new Properties();
+        properties.put(KEY_ACTIVEX_NATIVE.toUpperCase(), "true");
+
+        assertEquals("true", properties.getProperty(KEY_ACTIVEX_NATIVE.toUpperCase()));
+        
+        Url2Text testFetcher = new Url2Text(properties);
+        assertTrue(testFetcher.hasActiveXNative());
+    }
+    
+    @Test
+    public void testSystemPropertiesOverideMixedCase() throws Url2TextException 
+    {
+        String testKey = KEY_ACTIVEX_NATIVE.toUpperCase();
+        try
+        {
+            System.setProperty(testKey, Boolean.TRUE.toString());
+
+            Properties properties = new Properties();
+            properties.put(KEY_ACTIVEX_NATIVE, Boolean.FALSE.toString());
+
+            Url2Text fetcher = new Url2Text(properties);
+            assertTrue(fetcher.hasActiveXNative());
+        }
+        finally
+        {
+            System.getProperties().remove(testKey);
+        }
+    }
+    
     @Test
     public void testDefaults() 
     {

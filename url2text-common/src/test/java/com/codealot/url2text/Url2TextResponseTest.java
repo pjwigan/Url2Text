@@ -1,23 +1,23 @@
 package com.codealot.url2text;
 
-import static com.codealot.url2text.Constants.CONTENT_CHARSET;
-import static com.codealot.url2text.Constants.CONTENT_LENGTH;
-import static com.codealot.url2text.Constants.CONTENT_METADATA;
-import static com.codealot.url2text.Constants.CONTENT_TYPE;
-import static com.codealot.url2text.Constants.CONVERSION_TIME;
-import static com.codealot.url2text.Constants.CONVERTED_TEXT;
-import static com.codealot.url2text.Constants.ETAG;
-import static com.codealot.url2text.Constants.FETCH_TIME;
+import static com.codealot.url2text.Constants.HDR_CONTENT_CHARSET;
+import static com.codealot.url2text.Constants.HDR_CONTENT_LENGTH;
+import static com.codealot.url2text.Constants.HDR_CONTENT_METADATA;
+import static com.codealot.url2text.Constants.HDR_CONTENT_TYPE;
+import static com.codealot.url2text.Constants.HDR_CONVERSION_TIME;
+import static com.codealot.url2text.Constants.HDR_CONVERTED_TEXT;
+import static com.codealot.url2text.Constants.HDR_ETAG;
+import static com.codealot.url2text.Constants.HDR_FETCH_TIME;
 import static com.codealot.url2text.Constants.INT_NOT_SET;
-import static com.codealot.url2text.Constants.LANDING_PAGE;
-import static com.codealot.url2text.Constants.LAST_MODIFIED;
+import static com.codealot.url2text.Constants.HDR_LANDING_PAGE;
+import static com.codealot.url2text.Constants.HDR_LAST_MODIFIED;
 import static com.codealot.url2text.Constants.LONG_NOT_SET;
 import static com.codealot.url2text.Constants.STR_NOT_SET;
-import static com.codealot.url2text.Constants.REQUEST_PAGE;
-import static com.codealot.url2text.Constants.RESPONSE_HEADERS;
-import static com.codealot.url2text.Constants.STATUS;
-import static com.codealot.url2text.Constants.STATUS_MESSAGE;
-import static com.codealot.url2text.Constants.TRANSACTION_METADATA;
+import static com.codealot.url2text.Constants.HDR_REQUEST_PAGE;
+import static com.codealot.url2text.Constants.HDR_RESPONSE_HEADERS;
+import static com.codealot.url2text.Constants.HDR_STATUS;
+import static com.codealot.url2text.Constants.HDR_STATUS_MESSAGE;
+import static com.codealot.url2text.Constants.HDR_TRANSACTION_METADATA;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
@@ -65,28 +65,28 @@ public class Url2TextResponseTest
 
         JsonNode root = mapper.readTree(this.response.toJson());
         // top level objects
-        assertTrue(root.has(TRANSACTION_METADATA));
-        assertTrue(root.has(RESPONSE_HEADERS));
-        assertTrue(root.has(CONTENT_METADATA));
-        assertTrue(root.has(CONVERTED_TEXT));
+        assertTrue(root.has(HDR_TRANSACTION_METADATA));
+        assertTrue(root.has(HDR_RESPONSE_HEADERS));
+        assertTrue(root.has(HDR_CONTENT_METADATA));
+        assertTrue(root.has(HDR_CONVERTED_TEXT));
 
-        JsonNode tm = root.get(TRANSACTION_METADATA);
-        assertTrue(tm.has(REQUEST_PAGE));
-        assertTrue(tm.has(LANDING_PAGE));
-        assertTrue(tm.has(STATUS));
-        assertTrue(tm.has(STATUS_MESSAGE));
-        assertTrue(tm.has(FETCH_TIME));
-        assertTrue(tm.has(CONTENT_TYPE));
-        assertTrue(tm.has(CONTENT_CHARSET));
-        assertTrue(tm.has(CONTENT_LENGTH));
-        assertTrue(tm.has(ETAG));
-        assertTrue(tm.has(LAST_MODIFIED));
-        assertTrue(tm.has(CONVERSION_TIME));
+        JsonNode tm = root.get(HDR_TRANSACTION_METADATA);
+        assertTrue(tm.has(HDR_REQUEST_PAGE));
+        assertTrue(tm.has(HDR_LANDING_PAGE));
+        assertTrue(tm.has(HDR_STATUS));
+        assertTrue(tm.has(HDR_STATUS_MESSAGE));
+        assertTrue(tm.has(HDR_FETCH_TIME));
+        assertTrue(tm.has(HDR_CONTENT_TYPE));
+        assertTrue(tm.has(HDR_CONTENT_CHARSET));
+        assertTrue(tm.has(HDR_CONTENT_LENGTH));
+        assertTrue(tm.has(HDR_ETAG));
+        assertTrue(tm.has(HDR_LAST_MODIFIED));
+        assertTrue(tm.has(HDR_CONVERSION_TIME));
 
-        JsonNode rh = root.get(RESPONSE_HEADERS);
+        JsonNode rh = root.get(HDR_RESPONSE_HEADERS);
         assertTrue(rh.has("key1"));
 
-        JsonNode cm = root.get(CONTENT_METADATA);
+        JsonNode cm = root.get(HDR_CONTENT_METADATA);
         assertTrue(cm.has("key1"));
     }
 
@@ -138,20 +138,20 @@ public class Url2TextResponseTest
         this.response.setResponseHeaders(namesAndValues);
         String jsonString = this.response.toJson();
 
-        assertTrue(jsonString.contains(TRANSACTION_METADATA));
-        assertTrue(jsonString.contains(RESPONSE_HEADERS));
-        assertTrue(jsonString.contains(CONTENT_METADATA));
-        assertTrue(jsonString.contains(CONVERTED_TEXT));
-        assertTrue(jsonString.contains(REQUEST_PAGE));
-        assertTrue(jsonString.contains(LANDING_PAGE));
-        assertTrue(jsonString.contains(STATUS));
-        assertTrue(jsonString.contains(STATUS_MESSAGE));
-        assertTrue(jsonString.contains(FETCH_TIME));
-        assertTrue(jsonString.contains(CONTENT_TYPE));
-        assertTrue(jsonString.contains(CONTENT_CHARSET));
-        assertTrue(jsonString.contains(CONTENT_LENGTH));
-        assertTrue(jsonString.contains(ETAG));
-        assertTrue(jsonString.contains(CONVERSION_TIME));
+        assertTrue(jsonString.contains(HDR_TRANSACTION_METADATA));
+        assertTrue(jsonString.contains(HDR_RESPONSE_HEADERS));
+        assertTrue(jsonString.contains(HDR_CONTENT_METADATA));
+        assertTrue(jsonString.contains(HDR_CONVERTED_TEXT));
+        assertTrue(jsonString.contains(HDR_REQUEST_PAGE));
+        assertTrue(jsonString.contains(HDR_LANDING_PAGE));
+        assertTrue(jsonString.contains(HDR_STATUS));
+        assertTrue(jsonString.contains(HDR_STATUS_MESSAGE));
+        assertTrue(jsonString.contains(HDR_FETCH_TIME));
+        assertTrue(jsonString.contains(HDR_CONTENT_TYPE));
+        assertTrue(jsonString.contains(HDR_CONTENT_CHARSET));
+        assertTrue(jsonString.contains(HDR_CONTENT_LENGTH));
+        assertTrue(jsonString.contains(HDR_ETAG));
+        assertTrue(jsonString.contains(HDR_CONVERSION_TIME));
         assertTrue(jsonString.contains("key1"));
     }
 

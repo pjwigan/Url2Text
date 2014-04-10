@@ -75,16 +75,16 @@ import com.gargoylesoftware.htmlunit.xml.XmlPage;
  * act as a proxy for a human user).
  * <p>
  * Most of the HtmlUnit WebClientOptions and CookieManager features are exposed
- * as properties of the Url2Text class. Headers can also be added to the 
+ * as properties of the Url2Text class. Headers can also be added to the
  * WebRequest.
  * <p>
  * No transient state is stored in the Url2Text instance, so they can be reused
  * safely.
  * <p>
- * Configuration can be saved to a Properties file using the {@link #configAsProperties()}
- * method.  There is a constructore that accepts Properties for rapid configuration.
- * Also System properties can be given as override.  See the Constants class for
- * available keys.
+ * Configuration can be saved to a Properties file using the
+ * {@link #configAsProperties()} method. There is a constructore that accepts
+ * Properties for rapid configuration. Also System properties can be given as
+ * override. See the Constants class for available keys.
  * 
  * @author jacobsp
  *         <p>
@@ -162,90 +162,120 @@ public class Url2Text
     // ########################
     /**
      * Default constructor, enabling bean-hood.
+     * 
+     * @throws Url2TextException
      */
-    public Url2Text()
+    public Url2Text() throws Url2TextException
     {
-        this(null);
+        this(new Properties());
     };
+
+    private String safeGetPropertyBoolean(Properties properties, String key,
+            boolean defaultValue) throws Url2TextException
+    {
+        String value = properties.getProperty(key, Boolean.valueOf(defaultValue).toString());
+        value = value.toLowerCase(Locale.ENGLISH);
+        
+        if (value.equals("true") || value.equals("yes"))
+        {
+            return Boolean.TRUE.toString();
+        }
+        if (value.equals("false") || value.equals("no"))
+        {
+            return Boolean.FALSE.toString();
+        }
+        throw new Url2TextException("Bad value for " + key + " : " + value);
+    }
 
     /**
      * Constructor that accepts a Properties instance to configure the defaults.
      * <p>
-     * Only settings that vary from the defaults need to be present. Can be
-     * null or empty
+     * Only settings that vary from the defaults need to be present. Can be null
+     * or empty
      * 
-     * @param properties can be null or empty
+     * @param properties
+     *            can be null or empty
+     * @throws Url2TextException
      */
-    public Url2Text(Properties properties)
+    public Url2Text(Properties properties) throws Url2TextException
     {
-        if (properties == null) {
-            properties = new Properties();
-        }
-
-        if (properties.size() > PROPERTY_COUNT)
-        {
-            throw new IllegalArgumentException("Too many properties. Expected "
-                    + PROPERTY_COUNT + " but have " + properties.size());
-        }
+        Properties props = new Properties();
         
-        // apply system properties, if any
-        for (Enumeration<Object> e = System.getProperties().keys(); e.hasMoreElements(); ) 
+        if (properties != null)
         {
-            String key = e.nextElement().toString();
-            String value = System.getProperty(key);
-            
-            if (Arrays.asList(URL2TEXT_PROPERTY_KEYS).contains(key)) 
+            // make sure keys are in lowercase
+            for (Enumeration<Object> e = properties.keys(); e.hasMoreElements();)
             {
-                properties.put(key, value);
+                String key = e.nextElement().toString();            
+                String value = properties.getProperty(key);
+                props.put(key.toLowerCase(Locale.ENGLISH), value);
             }
         }
 
-        String activeXNative = properties.getProperty(ACTIVEX_NATIVE, Boolean
-                .valueOf(this.activeXNative).toString());
-        String appletEnabled = properties.getProperty(APPLET_ENABLED, Boolean
-                .valueOf(this.appletEnabled).toString());
-        String geolocationEnabled = properties.getProperty(GEOLOCATION_ENABLED,
-                Boolean.valueOf(this.geolocationEnabled).toString());
-        String popupBlockerEnabled = properties.getProperty(
-                POPUP_BLOCKER_ENABLED, Boolean
-                        .valueOf(this.popupBlockerEnabled).toString());
-        String exceptionOnScriptError = properties.getProperty(
-                EXCEPTION_ON_SCRIPT_ERROR,
-                Boolean.valueOf(this.exceptionOnScriptError).toString());
-        String exceptionOnFailingStatusCode = properties.getProperty(
-                EXCEPTION_ON_FAILING_STATUS,
-                Boolean.valueOf(this.exceptionOnFailingStatus).toString());
-        String printContentOnFailingStatusCode = properties.getProperty(
-                PRINT_CONTENT_ON_FAILING_STATUS,
-                Boolean.valueOf(this.printContentOnFailingStatus)
+        if (props.size() > PROPERTY_COUNT)
+        {
+            throw new IllegalArgumentException("Too many properties. Expected "
+                    + PROPERTY_COUNT + " but have " + props.size());
+        }
+
+        // apply system properties, if any
+        for (Enumeration<Object> e = System.getProperties().keys(); e
+                .hasMoreElements();)
+        {
+            String key = e.nextElement().toString();
+            String value = System.getProperty(key);
+
+            key = key.toLowerCase(Locale.ENGLISH);
+            if (Arrays.asList(URL2TEXT_PROPERTY_KEYS).contains(key))
+            {
+                props.put(key, value);
+            }
+        }
+
+        String activeXNative = safeGetPropertyBoolean(props,
+                KEY_ACTIVEX_NATIVE, this.activeXNative);
+        String appletEnabled = safeGetPropertyBoolean(props,
+                KEY_APPLET_ENABLED, this.appletEnabled);
+        String geolocationEnabled = safeGetPropertyBoolean(props,
+                KEY_GEOLOCATION_ENABLED, this.geolocationEnabled);
+        String popupBlockerEnabled = safeGetPropertyBoolean(props,
+                KEY_POPUP_BLOCKER_ENABLED, this.popupBlockerEnabled);
+        String exceptionOnScriptError = safeGetPropertyBoolean(props,
+                KEY_EXCEPTION_ON_SCRIPT_ERROR, this.exceptionOnScriptError);
+        String exceptionOnFailingStatusCode = safeGetPropertyBoolean(
+                props, KEY_EXCEPTION_ON_FAILING_STATUS,
+                this.exceptionOnFailingStatus);
+        String printContentOnFailingStatusCode = safeGetPropertyBoolean(
+                props, KEY_PRINT_CONTENT_ON_FAILING_STATUS,
+                this.printContentOnFailingStatus);
+        String cssEnabled = safeGetPropertyBoolean(props, KEY_CSS_ENABLED,
+                this.cssEnabled);
+        String doNotTrackEnabled = safeGetPropertyBoolean(props,
+                KEY_DO_NOT_TRACK_ENABLED, this.doNotTrackEnabled);
+        String javascriptEnabled = safeGetPropertyBoolean(props,
+                KEY_JAVASCRIPT_ENABLED, this.javascriptEnabled);
+        String useInsecureSSL = safeGetPropertyBoolean(props,
+                KEY_USE_INSECURE_SSL, this.useInsecureSSL);
+        String redirectEnabled = safeGetPropertyBoolean(props,
+                KEY_REDIRECT_ENABLED, this.redirectEnabled);
+        String cookiesEnabled = safeGetPropertyBoolean(props,
+                KEY_COOKIES_ENABLED, this.cookiesEnabled);
+        String clearCookies = safeGetPropertyBoolean(props,
+                KEY_CLEAR_COOKIES, this.clearCookies);
+        String clearExpiredCookies = safeGetPropertyBoolean(props,
+                KEY_CLEAR_EXPIRED_COOKIES, this.clearExpiredCookies);
+        String includeHeaders = safeGetPropertyBoolean(props,
+                KEY_INCLUDE_HEADERS, this.includeHeaders);
+        String includeMetadata = safeGetPropertyBoolean(props,
+                KEY_INCLUDE_METADATA, this.includeMetadata);
+        String networkTimeout = props.getProperty(KEY_NETWORK_TIMEOUT,
+                Integer.valueOf(this.networkTimeout).toString());
+        String javascriptTimeout = props.getProperty(
+                KEY_JAVASCRIPT_TIMEOUT, Integer.valueOf(this.javascriptTimeout)
                         .toString());
-        String cssEnabled = properties.getProperty(CSS_ENABLED, Boolean
-                .valueOf(this.cssEnabled).toString());
-        String doNotTrackEnabled = properties.getProperty(DO_NOT_TRACK_ENABLED,
-                Boolean.valueOf(this.doNotTrackEnabled).toString());
-        String javascriptEnabled = properties.getProperty(JAVASCRIPT_ENABLED,
-                Boolean.valueOf(this.javascriptEnabled).toString());
-        String useInsecureSSL = properties.getProperty(USE_INSECURE_SSL,
-                Boolean.valueOf(this.useInsecureSSL).toString());
-        String redirectEnabled = properties.getProperty(REDIRECT_ENABLED,
-                Boolean.valueOf(this.redirectEnabled).toString());
-        String cookiesEnabled = properties.getProperty(COOKIES_ENABLED, Boolean
-                .valueOf(this.cookiesEnabled).toString());
-        String clearCookies = properties.getProperty(CLEAR_COOKIES, Boolean
-                .valueOf(this.clearCookies).toString());
-        String clearExpiredCookies = properties.getProperty(
-                CLEAR_EXPIRED_COOKIES, Boolean
-                        .valueOf(this.clearExpiredCookies).toString());
-        String includeHeaders = properties.getProperty(INCLUDE_HEADERS, Boolean
-                .valueOf(this.includeHeaders).toString());
-        String includeMetadata = properties.getProperty(INCLUDE_METADATA,
-                Boolean.valueOf(this.includeMetadata).toString());
-        String networkTimeout = properties.getProperty(NETWORK_TIMEOUT, Integer
-                .valueOf(this.networkTimeout).toString());
-        String javascriptTimeout = properties.getProperty(JAVASCRIPT_TIMEOUT,
-                Integer.valueOf(this.javascriptTimeout).toString());
-        String maxContentLength = properties.getProperty(MAX_CONTENT_LENGTH,
-                Long.valueOf(this.maxContentLength).toString());
+        String maxContentLength = props.getProperty(
+                KEY_MAX_CONTENT_LENGTH, Long.valueOf(this.maxContentLength)
+                        .toString());
 
         setActiveXNative(Boolean.valueOf(activeXNative));
         setAppletEnabled(Boolean.valueOf(appletEnabled));
@@ -284,45 +314,45 @@ public class Url2Text
     {
         Properties properties = new Properties();
 
-        properties.setProperty(ACTIVEX_NATIVE,
+        properties.setProperty(KEY_ACTIVEX_NATIVE,
                 Boolean.valueOf(this.activeXNative).toString());
-        properties.setProperty(APPLET_ENABLED,
+        properties.setProperty(KEY_APPLET_ENABLED,
                 Boolean.valueOf(this.appletEnabled).toString());
-        properties.setProperty(GEOLOCATION_ENABLED,
+        properties.setProperty(KEY_GEOLOCATION_ENABLED,
                 Boolean.valueOf(this.geolocationEnabled).toString());
-        properties.setProperty(POPUP_BLOCKER_ENABLED,
+        properties.setProperty(KEY_POPUP_BLOCKER_ENABLED,
                 Boolean.valueOf(this.popupBlockerEnabled).toString());
-        properties.setProperty(EXCEPTION_ON_SCRIPT_ERROR,
+        properties.setProperty(KEY_EXCEPTION_ON_SCRIPT_ERROR,
                 Boolean.valueOf(this.exceptionOnScriptError).toString());
-        properties.setProperty(EXCEPTION_ON_FAILING_STATUS,
-                Boolean.valueOf(this.exceptionOnFailingStatus).toString());
-        properties.setProperty(PRINT_CONTENT_ON_FAILING_STATUS, Boolean
+        properties.setProperty(KEY_EXCEPTION_ON_FAILING_STATUS, Boolean
+                .valueOf(this.exceptionOnFailingStatus).toString());
+        properties.setProperty(KEY_PRINT_CONTENT_ON_FAILING_STATUS, Boolean
                 .valueOf(this.printContentOnFailingStatus).toString());
-        properties.setProperty(CSS_ENABLED, Boolean.valueOf(this.cssEnabled)
-                .toString());
-        properties.setProperty(DO_NOT_TRACK_ENABLED,
+        properties.setProperty(KEY_CSS_ENABLED, Boolean
+                .valueOf(this.cssEnabled).toString());
+        properties.setProperty(KEY_DO_NOT_TRACK_ENABLED,
                 Boolean.valueOf(this.doNotTrackEnabled).toString());
-        properties.setProperty(JAVASCRIPT_ENABLED,
+        properties.setProperty(KEY_JAVASCRIPT_ENABLED,
                 Boolean.valueOf(this.javascriptEnabled).toString());
-        properties.setProperty(USE_INSECURE_SSL,
+        properties.setProperty(KEY_USE_INSECURE_SSL,
                 Boolean.valueOf(this.useInsecureSSL).toString());
-        properties.setProperty(REDIRECT_ENABLED,
+        properties.setProperty(KEY_REDIRECT_ENABLED,
                 Boolean.valueOf(this.redirectEnabled).toString());
-        properties.setProperty(COOKIES_ENABLED,
+        properties.setProperty(KEY_COOKIES_ENABLED,
                 Boolean.valueOf(this.cookiesEnabled).toString());
-        properties.setProperty(CLEAR_COOKIES, Boolean
-                .valueOf(this.clearCookies).toString());
-        properties.setProperty(CLEAR_EXPIRED_COOKIES,
+        properties.setProperty(KEY_CLEAR_COOKIES,
+                Boolean.valueOf(this.clearCookies).toString());
+        properties.setProperty(KEY_CLEAR_EXPIRED_COOKIES,
                 Boolean.valueOf(this.clearExpiredCookies).toString());
-        properties.setProperty(INCLUDE_HEADERS,
+        properties.setProperty(KEY_INCLUDE_HEADERS,
                 Boolean.valueOf(this.includeHeaders).toString());
-        properties.setProperty(INCLUDE_METADATA,
+        properties.setProperty(KEY_INCLUDE_METADATA,
                 Boolean.valueOf(this.includeMetadata).toString());
-        properties.setProperty(NETWORK_TIMEOUT,
+        properties.setProperty(KEY_NETWORK_TIMEOUT,
                 Integer.valueOf(this.networkTimeout).toString());
-        properties.setProperty(JAVASCRIPT_TIMEOUT,
+        properties.setProperty(KEY_JAVASCRIPT_TIMEOUT,
                 Integer.valueOf(this.javascriptTimeout).toString());
-        properties.setProperty(MAX_CONTENT_LENGTH,
+        properties.setProperty(KEY_MAX_CONTENT_LENGTH,
                 Long.valueOf(this.maxContentLength).toString());
 
         if (properties.size() != PROPERTY_COUNT)
@@ -333,31 +363,19 @@ public class Url2Text
         }
         return properties;
     }
-    
+
     @Override
     public int hashCode()
     {
-        return Objects.hash(
-                this.activeXNative, 
-                this.appletEnabled, 
-                this.clearCookies,
-                this.clearExpiredCookies, 
-                this.cookiesEnabled, 
-                this.cssEnabled,
-                this.doNotTrackEnabled, 
-                this.exceptionOnFailingStatus, 
-                this.exceptionOnScriptError,
-                this.geolocationEnabled, 
-                this.includeHeaders, 
-                this.includeMetadata,
-                this.javascriptEnabled, 
-                this.popupBlockerEnabled,
-                this.printContentOnFailingStatus,
-                this.redirectEnabled,
-                this.useInsecureSSL,
-                this.networkTimeout,
-                this.javascriptTimeout,
-                this.maxContentLength);
+        return Objects.hash(this.activeXNative, this.appletEnabled,
+                this.clearCookies, this.clearExpiredCookies,
+                this.cookiesEnabled, this.cssEnabled, this.doNotTrackEnabled,
+                this.exceptionOnFailingStatus, this.exceptionOnScriptError,
+                this.geolocationEnabled, this.includeHeaders,
+                this.includeMetadata, this.javascriptEnabled,
+                this.popupBlockerEnabled, this.printContentOnFailingStatus,
+                this.redirectEnabled, this.useInsecureSSL, this.networkTimeout,
+                this.javascriptTimeout, this.maxContentLength);
     }
 
     @Override
@@ -684,11 +702,11 @@ public class Url2Text
         response.setFetchTime(webResponse.getLoadTime());
         response.setContentType(webResponse.getContentType());
         response.setContentCharset(webResponse.getContentCharset());
-        response.setEtag(webResponse.getResponseHeaderValue(ETAG));
+        response.setEtag(webResponse.getResponseHeaderValue(HDR_ETAG));
         response.setLastModified(webResponse
-                .getResponseHeaderValue(LAST_MODIFIED));
+                .getResponseHeaderValue(HDR_LAST_MODIFIED));
         response.setContentLength(webResponse
-                .getResponseHeaderValue(CONTENT_LENGTH));
+                .getResponseHeaderValue(HDR_CONTENT_LENGTH));
 
         // add headers, if asked for.
         if (includeHeaders)

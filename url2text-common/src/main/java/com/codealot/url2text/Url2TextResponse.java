@@ -89,20 +89,20 @@ public class Url2TextResponse implements Serializable
         final ObjectMapper mapper = new ObjectMapper();
         final JsonNode rootNode = mapper.readTree(json);
 
-        final JsonNode transactionNode = rootNode.get(TRANSACTION_METADATA);
-        this.requestPage = transactionNode.get(REQUEST_PAGE).textValue();
-        this.landingPage = transactionNode.get(LANDING_PAGE).textValue();
-        this.status = transactionNode.get(STATUS).asInt();
-        this.statusMessage = transactionNode.get(STATUS_MESSAGE).textValue();
-        this.fetchTime = transactionNode.get(FETCH_TIME).asLong();
-        this.contentType = transactionNode.get(CONTENT_TYPE).textValue();
-        this.contentCharset = transactionNode.get(CONTENT_CHARSET).textValue();
-        this.contentLength = transactionNode.get(CONTENT_LENGTH).asLong();
-        this.etag = transactionNode.get(ETAG).textValue();
-        this.lastModified = transactionNode.get(LAST_MODIFIED).textValue();
-        this.conversionTime = transactionNode.get(CONVERSION_TIME).asLong();
+        final JsonNode transactionNode = rootNode.get(HDR_TRANSACTION_METADATA);
+        this.requestPage = transactionNode.get(HDR_REQUEST_PAGE).textValue();
+        this.landingPage = transactionNode.get(HDR_LANDING_PAGE).textValue();
+        this.status = transactionNode.get(HDR_STATUS).asInt();
+        this.statusMessage = transactionNode.get(HDR_STATUS_MESSAGE).textValue();
+        this.fetchTime = transactionNode.get(HDR_FETCH_TIME).asLong();
+        this.contentType = transactionNode.get(HDR_CONTENT_TYPE).textValue();
+        this.contentCharset = transactionNode.get(HDR_CONTENT_CHARSET).textValue();
+        this.contentLength = transactionNode.get(HDR_CONTENT_LENGTH).asLong();
+        this.etag = transactionNode.get(HDR_ETAG).textValue();
+        this.lastModified = transactionNode.get(HDR_LAST_MODIFIED).textValue();
+        this.conversionTime = transactionNode.get(HDR_CONVERSION_TIME).asLong();
 
-        final JsonNode headersNode = rootNode.get(RESPONSE_HEADERS);
+        final JsonNode headersNode = rootNode.get(HDR_RESPONSE_HEADERS);
         for (final Iterator<String> i = headersNode.fieldNames(); i.hasNext();)
         {
             final String key = i.next();
@@ -110,7 +110,7 @@ public class Url2TextResponse implements Serializable
             this.responseHeaders.add(new NameAndValue(key, value));
         }
 
-        final JsonNode metadataNode = rootNode.get(CONTENT_METADATA);
+        final JsonNode metadataNode = rootNode.get(HDR_CONTENT_METADATA);
         for (final Iterator<String> i = metadataNode.fieldNames(); i.hasNext();)
         {
             final String key = i.next();
@@ -118,7 +118,7 @@ public class Url2TextResponse implements Serializable
             this.contentMetadata.add(new NameAndValue(key, value));
         }
 
-        this.convertedText = rootNode.get(CONVERTED_TEXT).textValue();
+        this.convertedText = rootNode.get(HDR_CONVERTED_TEXT).textValue();
     }
 
     /**
@@ -195,41 +195,41 @@ public class Url2TextResponse implements Serializable
             jsonGenerator.writeStartObject();
 
             // transaction metadata
-            jsonGenerator.writeFieldName(TRANSACTION_METADATA);
+            jsonGenerator.writeFieldName(HDR_TRANSACTION_METADATA);
             jsonGenerator.writeStartObject();
 
-            jsonGenerator.writeStringField(REQUEST_PAGE, this.requestPage);
-            jsonGenerator.writeStringField(LANDING_PAGE, this.landingPage);
-            jsonGenerator.writeNumberField(STATUS, this.status);
-            jsonGenerator.writeStringField(STATUS_MESSAGE, this.statusMessage);
-            jsonGenerator.writeNumberField(FETCH_TIME, this.fetchTime);
-            jsonGenerator.writeStringField(CONTENT_TYPE, this.contentType);
+            jsonGenerator.writeStringField(HDR_REQUEST_PAGE, this.requestPage);
+            jsonGenerator.writeStringField(HDR_LANDING_PAGE, this.landingPage);
+            jsonGenerator.writeNumberField(HDR_STATUS, this.status);
+            jsonGenerator.writeStringField(HDR_STATUS_MESSAGE, this.statusMessage);
+            jsonGenerator.writeNumberField(HDR_FETCH_TIME, this.fetchTime);
+            jsonGenerator.writeStringField(HDR_CONTENT_TYPE, this.contentType);
             jsonGenerator
-                    .writeStringField(CONTENT_CHARSET, this.contentCharset);
-            jsonGenerator.writeNumberField(CONTENT_LENGTH, this.contentLength);
-            jsonGenerator.writeStringField(ETAG, this.etag);
-            jsonGenerator.writeStringField(LAST_MODIFIED, this.lastModified);
+                    .writeStringField(HDR_CONTENT_CHARSET, this.contentCharset);
+            jsonGenerator.writeNumberField(HDR_CONTENT_LENGTH, this.contentLength);
+            jsonGenerator.writeStringField(HDR_ETAG, this.etag);
+            jsonGenerator.writeStringField(HDR_LAST_MODIFIED, this.lastModified);
             jsonGenerator
-                    .writeNumberField(CONVERSION_TIME, this.conversionTime);
+                    .writeNumberField(HDR_CONVERSION_TIME, this.conversionTime);
 
             jsonGenerator.writeEndObject();
 
             // response headers
             if (!this.responseHeaders.isEmpty())
             {
-                outputNameAndValueArray(jsonGenerator, RESPONSE_HEADERS,
+                outputNameAndValueArray(jsonGenerator, HDR_RESPONSE_HEADERS,
                         this.responseHeaders);
             }
 
             // content metadata
             if (!this.contentMetadata.isEmpty())
             {
-                outputNameAndValueArray(jsonGenerator, CONTENT_METADATA,
+                outputNameAndValueArray(jsonGenerator, HDR_CONTENT_METADATA,
                         this.contentMetadata);
             }
 
             // text
-            jsonGenerator.writeStringField(CONVERTED_TEXT, this.convertedText);
+            jsonGenerator.writeStringField(HDR_CONVERTED_TEXT, this.convertedText);
         }
         catch (IOException e)
         {
