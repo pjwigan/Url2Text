@@ -69,6 +69,15 @@ public class Url2TextAPITest
         }
     }
     
+    @Test(expected = IllegalArgumentException.class)
+    public void testPropertiesBadKey() throws Url2TextException 
+    {
+        final Properties properties = new Properties();
+        properties.put("Bananas", Boolean.TRUE.toString());
+
+        new Url2Text(properties);
+    }
+    
     @Test(expected = Url2TextException.class)
     public void testPropertiesBadValue() throws Url2TextException 
     {
@@ -77,7 +86,6 @@ public class Url2TextAPITest
 
         new Url2Text(properties);
     }
-    
     @Test
     public void testPropertiesMixedCaseKey() throws Url2TextException 
     {

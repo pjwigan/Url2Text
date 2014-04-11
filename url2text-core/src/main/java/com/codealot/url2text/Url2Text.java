@@ -160,32 +160,16 @@ public class Url2Text
     // ########################
     // ##### CONSTRUCTORS #####
     // ########################
+
     /**
      * Default constructor, enabling bean-hood.
      * 
      * @throws Url2TextException
      */
-    public Url2Text() throws Url2TextException 
+    public Url2Text() throws Url2TextException
     {
         this(null);
     };
-
-    private String safeGetPropertyBoolean(final Properties properties, final String key,
-            final boolean defaultValue) throws Url2TextException
-    {
-        String value = properties.getProperty(key, Boolean.valueOf(defaultValue).toString());
-        value = value.toLowerCase(Locale.ENGLISH);
-        
-        if (value.equals("true") || value.equals("yes"))
-        {
-            return Boolean.TRUE.toString();
-        }
-        if (value.equals("false") || value.equals("no"))
-        {
-            return Boolean.FALSE.toString();
-        }
-        throw new Url2TextException("Bad value for " + key + " : " + value);
-    }
 
     /**
      * Constructor that accepts a Properties instance to configure the defaults.
@@ -200,22 +184,24 @@ public class Url2Text
     public Url2Text(final Properties properties) throws Url2TextException
     {
         final Properties props = new Properties();
-        
+        final List<String> keys = Arrays.asList(URL2TEXT_PROPERTY_KEYS);
+
         if (properties != null)
         {
-            // make sure keys are in lowercase
-            for (final Enumeration<Object> e = properties.keys(); e.hasMoreElements();)
+            // make sure keys are known and in lowercase
+            for (final Enumeration<Object> e = properties.keys(); e
+                    .hasMoreElements();)
             {
-                final String key = e.nextElement().toString();            
+                String key = e.nextElement().toString();
                 final String value = properties.getProperty(key);
-                props.put(key.toLowerCase(Locale.ENGLISH), value);
+                key = key.toLowerCase(Locale.ENGLISH);
+                if (!keys.contains(key))
+                {
+                    throw new IllegalArgumentException(
+                            "Unrecognised property key: " + key);
+                }
+                props.put(key, value);
             }
-        }
-
-        if (props.size() > PROPERTY_COUNT)
-        {
-            throw new IllegalArgumentException("Too many properties. Expected "
-                    + PROPERTY_COUNT + " but have " + props.size());
         }
 
         // apply system properties, if any
@@ -226,12 +212,13 @@ public class Url2Text
             final String value = System.getProperty(key);
 
             key = key.toLowerCase(Locale.ENGLISH);
-            if (Arrays.asList(URL2TEXT_PROPERTY_KEYS).contains(key))
+            if (keys.contains(key))
             {
                 props.put(key, value);
             }
         }
 
+        // update active configuration
         final String activeXNative = safeGetPropertyBoolean(props,
                 KEY_ACTIVEX_NATIVE, this.activeXNative);
         final String appletEnabled = safeGetPropertyBoolean(props,
@@ -248,8 +235,8 @@ public class Url2Text
         final String printContentOnFailingStatusCode = safeGetPropertyBoolean(
                 props, KEY_PRINT_CONTENT_ON_FAILING_STATUS,
                 this.printContentOnFailingStatus);
-        final String cssEnabled = safeGetPropertyBoolean(props, KEY_CSS_ENABLED,
-                this.cssEnabled);
+        final String cssEnabled = safeGetPropertyBoolean(props,
+                KEY_CSS_ENABLED, this.cssEnabled);
         final String doNotTrackEnabled = safeGetPropertyBoolean(props,
                 KEY_DO_NOT_TRACK_ENABLED, this.doNotTrackEnabled);
         final String javascriptEnabled = safeGetPropertyBoolean(props,
@@ -301,9 +288,9 @@ public class Url2Text
         setMaxContentLength(Long.valueOf(maxContentLength));
     }
 
-    // ###################
-    // ##### METHODS #####
-    // ###################
+    // ##########################
+    // ##### PUBLIC METHODS #####
+    // ##########################
 
     /**
      * Returns a Properties object, encapsulating the current config.
@@ -390,96 +377,14 @@ public class Url2Text
         {
             result = false;
         }
-        else {
+        else
+        {
             final Url2Text test = (Url2Text) obj;
             // all content is included in properties, so this is safe.
-            result = test.configAsProperties().equals(this.configAsProperties());
+            result = test.configAsProperties()
+                    .equals(this.configAsProperties());
         }
         return result;
-    }
-
-    /**
-     * Configure a WebClient using internal state.
-     * 
-     * @return the configured WebClient
-     */
-    private WebClient prepareWebClient()
-    {
-        final WebClient client = new WebClient(BrowserVersion.FIREFOX_24);
-
-        if (this.javascriptTimeout > 0)
-        {
-            client.waitForBackgroundJavaScript(this.javascriptTimeout * 1_000);
-        }
-        final WebClientOptions options = client.getOptions();
-
-        // configure web client
-        options.setActiveXNative(this.activeXNative);
-        options.setAppletEnabled(this.appletEnabled);
-        options.setCssEnabled(this.cssEnabled);
-        options.setDoNotTrackEnabled(this.doNotTrackEnabled);
-        options.setGeolocationEnabled(this.geolocationEnabled);
-        options.setJavaScriptEnabled(this.javascriptEnabled);
-        options.setPopupBlockerEnabled(this.popupBlockerEnabled);
-        options.setPrintContentOnFailingStatusCode(this.printContentOnFailingStatus);
-        options.setRedirectEnabled(this.redirectEnabled);
-        options.setThrowExceptionOnFailingStatusCode(this.exceptionOnFailingStatus);
-        options.setThrowExceptionOnScriptError(this.exceptionOnScriptError);
-        options.setUseInsecureSSL(this.useInsecureSSL);
-        options.setTimeout(this.networkTimeout * 1_000);
-
-        // configure cookies
-        final CookieManager cookieManager = client.getCookieManager();
-        cookieManager.setCookiesEnabled(this.cookiesEnabled);
-        if (this.cookiesEnabled)
-        {
-            if (this.clearCookies)
-            {
-                cookieManager.clearCookies();
-            }
-            else if (this.clearExpiredCookies)
-            {
-                cookieManager.clearExpired(new Date());
-            }
-        }
-
-        return client;
-    }
-
-    /**
-     * Determine if a page contains docbook content.
-     * 
-     * @param page
-     * @return boolean flag
-     */
-    private boolean isDocbook(final Page page)
-    {
-        boolean isDocbook = false;
-
-        if (page instanceof XmlPage)
-        {
-            final XmlPage xmlPage = (XmlPage) page;
-
-            // test for docBook
-            String nameSpace = xmlPage.getXmlDocument().getDocumentElement()
-                    .getNamespaceURI();
-            final DocumentType documentType = xmlPage.getXmlDocument().getDoctype();
-            if (documentType != null)
-            {
-                final String publicId = documentType.getPublicId();
-                final String systemId = documentType.getSystemId();
-
-                nameSpace = "" + nameSpace + publicId + systemId; // ns might be
-                                                                  // null,
-                // hence the ""+
-            }
-            if (nameSpace != null && nameSpace.length() > 0)
-            {
-                isDocbook = nameSpace.toLowerCase(Locale.ENGLISH).contains(
-                        "docbook");
-            }
-        }
-        return isDocbook;
     }
 
     /**
@@ -490,9 +395,10 @@ public class Url2Text
      * @return a response object
      * @throws Url2TextException
      */
-    public Url2TextResponse contentAsText(final String requestUrl,
+    public Url2TextResponse contentAsText(
+            final String requestUrl,
             final Map<String, String> additionalHeaders)
-            throws Url2TextException
+                    throws Url2TextException
     {
         try
         {
@@ -503,27 +409,6 @@ public class Url2Text
         {
             throw new Url2TextException(e);
         }
-    }
-
-    /**
-     * Construct a WebRequest and add any additional headers.
-     * 
-     * @param requestUrl
-     * @param additionalHeaders
-     * @return the configured WebRequest
-     */
-    private WebRequest prepareRequest(final URL requestUrl,
-            final Map<String, String> additionalHeaders)
-    {
-        final WebRequest request = new WebRequest(requestUrl, HttpMethod.GET);
-
-        request.setCharset(UTF_8);
-
-        if (additionalHeaders != null && !additionalHeaders.isEmpty())
-        {
-            request.setAdditionalHeaders(additionalHeaders);
-        }
-        return request;
     }
 
     /**
@@ -543,9 +428,10 @@ public class Url2Text
      * @return the data generated by the fetch operation
      * @throws Url2TextException
      */
-    public Url2TextResponse contentAsText(final URL requestUrl,
+    public Url2TextResponse contentAsText(
+            final URL requestUrl,
             final Map<String, String> additionalHeaders)
-            throws Url2TextException
+                    throws Url2TextException
     {
         // check params
         Objects.requireNonNull(requestUrl, "No URL available to be fetched.");
@@ -588,35 +474,7 @@ public class Url2Text
         if (this.includeMetadata || isDocBook || page instanceof BinaryPage
                 || page instanceof UnexpectedPage)
         {
-            try
-            {
-                final long convertStart = new Date().getTime();
-
-                final Metadata metadata = new Metadata();
-                final Tika tika = new Tika();
-                tika.setMaxStringLength(-1); // unlimited length response
-
-                final String contentType = response.getContentType();
-                if (contentType != null && contentType.length() > 0)
-                {
-                    metadata.add(HttpHeaders.CONTENT_TYPE, contentType);
-                }
-                text = tika.parseToString(page.getWebResponse()
-                        .getContentAsStream(), metadata);
-
-                response.setConversionTime(new Date().getTime() - convertStart);
-
-                if (this.includeMetadata)
-                {
-                    // response.setConversionMetadata(metadata);
-                    addMetadataToResponse(metadata, response);
-                }
-            }
-            catch (IOException | TikaException e)
-            {
-                throw new Url2TextException(
-                        "Failed to convert text (content encrypted)?", e);
-            }
+            text = invokeTika(response, page);
         }
 
         // retrieve text content, if not already determined above
@@ -628,7 +486,6 @@ public class Url2Text
         }
         else if (page instanceof TextPage)
         {
-
             final TextPage source = (TextPage) page;
             text = source.getContent();
         }
@@ -639,7 +496,6 @@ public class Url2Text
         }
         else if (page instanceof JavaScriptPage)
         {
-
             final JavaScriptPage source = (JavaScriptPage) page;
             text = source.getContent();
         }
@@ -648,82 +504,6 @@ public class Url2Text
         response.setConvertedText(text);
         LOG.debug(response.toString());
 
-        return response;
-    }
-
-    /**
-     * Add the Tika metadata into the response object.
-     * 
-     * @param tikaMetadata
-     * @param response
-     */
-    private void addMetadataToResponse(final Metadata tikaMetadata,
-            final Url2TextResponse response)
-    {
-        final List<NameAndValue> localHeaders = new ArrayList<>();
-        final String[] headers = tikaMetadata.names();
-        for (final String header : headers)
-        {
-
-            final String[] values = tikaMetadata.getValues(header);
-            if (values.length == 0)
-            {
-                localHeaders.add(new NameAndValue(header, ""));
-                continue;
-            }
-            for (final String value : values)
-            {
-                localHeaders.add(new NameAndValue(header, value));
-            }
-        }
-        response.setContentMetadata(localHeaders);
-    }
-
-    /**
-     * Build a response object with transaction metadata.
-     * 
-     * @param requestUrl
-     * @param page
-     * @param includeHeaders
-     * @return populated response
-     */
-    private Url2TextResponse buildResponse(final URL requestUrl,
-            final Page page, final boolean includeHeaders)
-    {
-        final Url2TextResponse response = new Url2TextResponse();
-
-        // capture the request URL
-        response.setRequestPage(requestUrl.toExternalForm());
-
-        // capture some page details
-        response.setLandingPage(page.getUrl().toExternalForm());
-
-        // capture some response details
-        final WebResponse webResponse = page.getWebResponse();
-
-        response.setStatus(webResponse.getStatusCode());
-        response.setStatusMessage(webResponse.getStatusMessage());
-        response.setFetchTime(webResponse.getLoadTime());
-        response.setContentType(webResponse.getContentType());
-        response.setContentCharset(webResponse.getContentCharset());
-        response.setEtag(webResponse.getResponseHeaderValue(HDR_ETAG));
-        response.setLastModified(webResponse
-                .getResponseHeaderValue(HDR_LAST_MODIFIED));
-        response.setContentLength(webResponse
-                .getResponseHeaderValue(HDR_CONTENT_LENGTH));
-
-        // add headers, if asked for.
-        if (includeHeaders)
-        {
-            // convert HtmlUnit NameValuePair to ours, to avoid dependency.
-            final List<NameAndValue> localHeaders = new ArrayList<>();
-            for (final NameValuePair nvp : webResponse.getResponseHeaders())
-            {
-                localHeaders
-                        .add(new NameAndValue(nvp.getName(), nvp.getValue()));
-            }
-            response.setResponseHeaders(localHeaders);
-        }
         return response;
     }
 
@@ -1003,6 +783,273 @@ public class Url2Text
             LOG.warn("Max length set to {}.", maxLength);
         }
         this.maxContentLength = maxLength;
+    }
+
+    // ###########################
+    // ##### PRIVATE METHODS #####
+    // ###########################
+
+    /**
+     * Add the Tika metadata into the response object.
+     * 
+     * @param tikaMetadata
+     * @param response
+     */
+    private void addMetadataToResponse(
+            final Metadata tikaMetadata,
+            final Url2TextResponse response)
+    {
+        final List<NameAndValue> localHeaders = new ArrayList<>();
+        final String[] headers = tikaMetadata.names();
+        for (final String header : headers)
+        {
+
+            final String[] values = tikaMetadata.getValues(header);
+            if (values.length == 0)
+            {
+                localHeaders.add(new NameAndValue(header, ""));
+                continue;
+            }
+            for (final String value : values)
+            {
+                localHeaders.add(new NameAndValue(header, value));
+            }
+        }
+        response.setContentMetadata(localHeaders);
+    }
+
+    /**
+     * Build a response object with transaction metadata.
+     * 
+     * @param requestUrl
+     * @param page
+     * @param includeHeaders
+     * @return populated response
+     */
+    private Url2TextResponse buildResponse(
+            final URL requestUrl,
+            final Page page, 
+            final boolean includeHeaders)
+    {
+        final Url2TextResponse response = new Url2TextResponse();
+
+        // capture the request URL
+        response.setRequestPage(requestUrl.toExternalForm());
+
+        // capture some page details
+        response.setLandingPage(page.getUrl().toExternalForm());
+
+        // capture some response details
+        final WebResponse webResponse = page.getWebResponse();
+
+        response.setStatus(webResponse.getStatusCode());
+        response.setStatusMessage(webResponse.getStatusMessage());
+        response.setFetchTime(webResponse.getLoadTime());
+        response.setContentType(webResponse.getContentType());
+        response.setContentCharset(webResponse.getContentCharset());
+        response.setEtag(webResponse.getResponseHeaderValue(HDR_ETAG));
+        response.setLastModified(webResponse
+                .getResponseHeaderValue(HDR_LAST_MODIFIED));
+        response.setContentLength(webResponse
+                .getResponseHeaderValue(HDR_CONTENT_LENGTH));
+
+        // add headers, if asked for.
+        if (includeHeaders)
+        {
+            // convert HtmlUnit NameValuePair to ours, to avoid dependency.
+            final List<NameAndValue> localHeaders = new ArrayList<>();
+            for (final NameValuePair nvp : webResponse.getResponseHeaders())
+            {
+                localHeaders
+                        .add(new NameAndValue(nvp.getName(), nvp.getValue()));
+            }
+            response.setResponseHeaders(localHeaders);
+        }
+        return response;
+    }
+
+    /**
+     * Determine if a page contains docbook content.
+     * 
+     * @param page
+     * @return boolean flag
+     */
+    private boolean isDocbook(final Page page)
+    {
+        boolean isDocbook = false;
+
+        if (page instanceof XmlPage)
+        {
+            final XmlPage xmlPage = (XmlPage) page;
+
+            // test for docBook
+            String nameSpace = xmlPage.getXmlDocument().getDocumentElement()
+                    .getNamespaceURI();
+            final DocumentType documentType = xmlPage.getXmlDocument()
+                    .getDoctype();
+            if (documentType != null)
+            {
+                final String publicId = documentType.getPublicId();
+                final String systemId = documentType.getSystemId();
+
+                nameSpace = "" + nameSpace + publicId + systemId; // ns might be
+                                                                  // null,
+                // hence the ""+
+            }
+            if (nameSpace != null && nameSpace.length() > 0)
+            {
+                isDocbook = nameSpace.toLowerCase(Locale.ENGLISH).contains(
+                        "docbook");
+            }
+        }
+        return isDocbook;
+    }
+
+    /**
+     * Construct a WebRequest and add any additional headers.
+     * 
+     * @param requestUrl
+     * @param additionalHeaders
+     * @return the configured WebRequest
+     */
+    private WebRequest prepareRequest(
+            final URL requestUrl,
+            final Map<String, String> additionalHeaders)
+    {
+        final WebRequest request = new WebRequest(requestUrl, HttpMethod.GET);
+
+        request.setCharset(UTF_8);
+
+        if (additionalHeaders != null && !additionalHeaders.isEmpty())
+        {
+            request.setAdditionalHeaders(additionalHeaders);
+        }
+        return request;
+    }
+
+    /**
+     * Configure a WebClient using internal state.
+     * 
+     * @return the configured WebClient
+     */
+    private WebClient prepareWebClient()
+    {
+        final WebClient client = new WebClient(BrowserVersion.FIREFOX_24);
+
+        if (this.javascriptTimeout > 0)
+        {
+            client.waitForBackgroundJavaScript(this.javascriptTimeout * 1_000);
+        }
+        final WebClientOptions options = client.getOptions();
+
+        // configure web client
+        options.setActiveXNative(this.activeXNative);
+        options.setAppletEnabled(this.appletEnabled);
+        options.setCssEnabled(this.cssEnabled);
+        options.setDoNotTrackEnabled(this.doNotTrackEnabled);
+        options.setGeolocationEnabled(this.geolocationEnabled);
+        options.setJavaScriptEnabled(this.javascriptEnabled);
+        options.setPopupBlockerEnabled(this.popupBlockerEnabled);
+        options.setPrintContentOnFailingStatusCode(this.printContentOnFailingStatus);
+        options.setRedirectEnabled(this.redirectEnabled);
+        options.setThrowExceptionOnFailingStatusCode(this.exceptionOnFailingStatus);
+        options.setThrowExceptionOnScriptError(this.exceptionOnScriptError);
+        options.setUseInsecureSSL(this.useInsecureSSL);
+        options.setTimeout(this.networkTimeout * 1_000);
+
+        // configure cookies
+        final CookieManager cookieManager = client.getCookieManager();
+        cookieManager.setCookiesEnabled(this.cookiesEnabled);
+        if (this.cookiesEnabled)
+        {
+            if (this.clearCookies)
+            {
+                cookieManager.clearCookies();
+            }
+            else if (this.clearExpiredCookies)
+            {
+                cookieManager.clearExpired(new Date());
+            }
+        }
+
+        return client;
+    }
+
+    /**
+     * Utility to treat "yes/no" and "true/false" case insensitively as valid
+     * boolean representations.
+     * 
+     * @param properties
+     * @param key
+     * @param defaultValue
+     * @return
+     * @throws Url2TextException
+     */
+    private String safeGetPropertyBoolean(
+            final Properties properties,
+            final String key, 
+            final boolean defaultValue)
+                    throws Url2TextException
+    {
+        String value = properties.getProperty(key, Boolean
+                .valueOf(defaultValue).toString());
+        value = value.toLowerCase(Locale.ENGLISH);
+
+        if (value.equals("true") || value.equals("yes"))
+        {
+            return Boolean.TRUE.toString();
+        }
+        if (value.equals("false") || value.equals("no"))
+        {
+            return Boolean.FALSE.toString();
+        }
+        throw new Url2TextException("Bad value for " + key + " : " + value);
+    }
+
+    /**
+     * Call Tika to convert to text and/or extract content metadata.
+     * 
+     * @param response
+     * @param page
+     * @return converted text
+     * @throws Url2TextException
+     */
+    private String invokeTika(
+            final Url2TextResponse response, 
+            final Page page)
+                    throws Url2TextException
+    {
+        try
+        {
+            final long convertStart = new Date().getTime();
+
+            final Metadata metadata = new Metadata();
+            final Tika tika = new Tika();
+            tika.setMaxStringLength(-1); // unlimited length response
+
+            final String contentType = response.getContentType();
+            if (contentType != null && contentType.length() > 0)
+            {
+                metadata.add(HttpHeaders.CONTENT_TYPE, contentType);
+            }
+            final String text = tika.parseToString(page.getWebResponse()
+                    .getContentAsStream(), metadata);
+
+            response.setConversionTime(new Date().getTime() - convertStart);
+
+            if (this.includeMetadata)
+            {
+                // response.setConversionMetadata(metadata);
+                addMetadataToResponse(metadata, response);
+            }
+
+            return text;
+        }
+        catch (IOException | TikaException e)
+        {
+            throw new Url2TextException(
+                    "Failed to convert text (content encrypted)?", e);
+        }
     }
 
 }
