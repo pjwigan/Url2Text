@@ -129,16 +129,20 @@ public class Url2TextResponse implements Serializable
      */
     public String asFormat(final OutputFormat format) throws Url2TextException
     {
+        String result = null;
         if (format == OutputFormat.PLAIN)
         {
-            return this.toString();
+            result = this.toString();
         }
         else if (format == OutputFormat.JSON)
         {
-            return this.toJson();
+            result = this.toJson();
         }
-        throw new IllegalArgumentException("Format " + format
+        else {
+            throw new IllegalArgumentException("Format " + format
                 + " not supported.");
+        }
+        return result;
     }
 
     @Override
@@ -164,17 +168,22 @@ public class Url2TextResponse implements Serializable
     @Override
     public boolean equals(final Object obj)
     {
+        boolean result = false;
         if (this == obj)
         {
-            return true;
+            result = true;
         }
-        if (obj == null || obj.getClass() != this.getClass())
+        else if (obj == null || obj.getClass() != this.getClass())
         {
-            return false;
+            result = false;
         }
-        final Url2TextResponse test = (Url2TextResponse) obj;
-        // all content is included in toString(), so this is safe.
-        return test.toString().equals(this.toString());
+        else {
+            final Url2TextResponse test = (Url2TextResponse) obj;
+            // all content is included in toString(), so this is safe.
+            result = test.toString().equals(this.toString());
+        }
+        
+        return result;
     }
 
     /**
@@ -276,7 +285,7 @@ public class Url2TextResponse implements Serializable
     @Override
     public String toString()
     {
-        final StringBuilder buffer = new StringBuilder(310);
+        final StringBuilder buffer = new StringBuilder(350);
 
         buffer.append("################ TRANSACTION METADATA ################");
         buffer.append("\nRequest page   : ").append(this.requestPage);

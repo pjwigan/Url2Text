@@ -51,7 +51,7 @@ public class Constants
     public static final String HDR_STATUS_MESSAGE = "Status-Message";
     public static final String HDR_TRANSACTION_METADATA = "Transaction-Metadata";
 
-    // Url2Text.class System property keys.  Also used as GET params (length
+    // Url2Text.class System property keys. Also used as GET params (length
     // irrelevant as not intended to be typed).
     public static final String KEY_ACTIVEX_NATIVE = "url2text.activexnative";
     public static final String KEY_APPLET_ENABLED = "url2text.appletenabled";
@@ -77,34 +77,24 @@ public class Constants
     public static final String KEY_REQUEST_URL = "url2text.requesturl";
     public static final String KEY_LAST_MODIFIED = "url2text.lastmodified";
     public static final String KEY_ETAG = "url2text.etag";
-    
+
     // Collection of Url2Text.class property labels (i.e. GET params excluded)
-    public static final String[] URL2TEXT_PROPERTY_KEYS = {
-        KEY_ACTIVEX_NATIVE,
-        KEY_APPLET_ENABLED,
-        KEY_GEOLOCATION_ENABLED,
-        KEY_POPUP_BLOCKER_ENABLED,
-        KEY_EXCEPTION_ON_SCRIPT_ERROR,
-        KEY_EXCEPTION_ON_FAILING_STATUS,
-        KEY_PRINT_CONTENT_ON_FAILING_STATUS,
-        KEY_CSS_ENABLED,
-        KEY_DO_NOT_TRACK_ENABLED,
-        KEY_JAVASCRIPT_ENABLED,
-        KEY_USE_INSECURE_SSL,
-        KEY_REDIRECT_ENABLED,
-        KEY_COOKIES_ENABLED,
-        KEY_CLEAR_COOKIES,
-        KEY_CLEAR_EXPIRED_COOKIES,
-        KEY_INCLUDE_HEADERS,
-        KEY_INCLUDE_METADATA,
-        KEY_NETWORK_TIMEOUT,
-        KEY_JAVASCRIPT_TIMEOUT,
-        KEY_MAX_CONTENT_LENGTH
-    };
-    
-    // Default name of property file.  Also used as System property key.
+    public static final String[] URL2TEXT_PROPERTY_KEYS = 
+          { KEY_ACTIVEX_NATIVE,
+            KEY_APPLET_ENABLED, KEY_GEOLOCATION_ENABLED,
+            KEY_POPUP_BLOCKER_ENABLED, KEY_EXCEPTION_ON_SCRIPT_ERROR,
+            KEY_EXCEPTION_ON_FAILING_STATUS,
+            KEY_PRINT_CONTENT_ON_FAILING_STATUS, KEY_CSS_ENABLED,
+            KEY_DO_NOT_TRACK_ENABLED, KEY_JAVASCRIPT_ENABLED,
+            KEY_USE_INSECURE_SSL, KEY_REDIRECT_ENABLED, KEY_COOKIES_ENABLED,
+            KEY_CLEAR_COOKIES, KEY_CLEAR_EXPIRED_COOKIES, KEY_INCLUDE_HEADERS,
+            KEY_INCLUDE_METADATA, KEY_NETWORK_TIMEOUT, KEY_JAVASCRIPT_TIMEOUT,
+            KEY_MAX_CONTENT_LENGTH 
+          };
+
+    // Default name of property file. Also used as System property key.
     public static final String URL2TEXT_PROPERTIES = "url2text.properties";
-    
+
     // other constants
     public static final String UTF_8 = "UTF-8";
 

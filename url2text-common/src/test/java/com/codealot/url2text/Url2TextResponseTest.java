@@ -1,43 +1,23 @@
 package com.codealot.url2text;
 
-import static com.codealot.url2text.Constants.HDR_CONTENT_CHARSET;
-import static com.codealot.url2text.Constants.HDR_CONTENT_LENGTH;
-import static com.codealot.url2text.Constants.HDR_CONTENT_METADATA;
-import static com.codealot.url2text.Constants.HDR_CONTENT_TYPE;
-import static com.codealot.url2text.Constants.HDR_CONVERSION_TIME;
-import static com.codealot.url2text.Constants.HDR_CONVERTED_TEXT;
-import static com.codealot.url2text.Constants.HDR_ETAG;
-import static com.codealot.url2text.Constants.HDR_FETCH_TIME;
-import static com.codealot.url2text.Constants.INT_NOT_SET;
-import static com.codealot.url2text.Constants.HDR_LANDING_PAGE;
-import static com.codealot.url2text.Constants.HDR_LAST_MODIFIED;
-import static com.codealot.url2text.Constants.LONG_NOT_SET;
-import static com.codealot.url2text.Constants.STR_NOT_SET;
-import static com.codealot.url2text.Constants.HDR_REQUEST_PAGE;
-import static com.codealot.url2text.Constants.HDR_RESPONSE_HEADERS;
-import static com.codealot.url2text.Constants.HDR_STATUS;
-import static com.codealot.url2text.Constants.HDR_STATUS_MESSAGE;
-import static com.codealot.url2text.Constants.HDR_TRANSACTION_METADATA;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertTrue;
+import static com.codealot.url2text.Constants.*;
+import static org.junit.Assert.*;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
 
-import com.codealot.url2text.Constants.OutputFormat;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class Url2TextResponseTest
 {
 
-    private ObjectMapper mapper = new ObjectMapper();
-    private Url2TextResponse response = new Url2TextResponse();
-    private ArrayList<NameAndValue> namesAndValues = new ArrayList<>();
+    private final ObjectMapper mapper = new ObjectMapper();
+    private final Url2TextResponse response = new Url2TextResponse();
+    private final List<NameAndValue> namesAndValues = new ArrayList<>();
 
     @Before
     public void setUp() throws Exception
@@ -49,10 +29,10 @@ public class Url2TextResponseTest
     public void testAsFormat() throws Url2TextException
     {
         // just check the type returned
-        String s = this.response.asFormat(OutputFormat.PLAIN);
+        final String s = this.response.asFormat(OutputFormat.PLAIN);
         assertTrue(s.startsWith("####"));
 
-        String j = this.response.asFormat(OutputFormat.JSON);
+        final String j = this.response.asFormat(OutputFormat.JSON);
         assertTrue(j.startsWith("{\"Transaction"));
     }
 
@@ -63,14 +43,14 @@ public class Url2TextResponseTest
         this.response.setContentMetadata(namesAndValues);
         this.response.setResponseHeaders(namesAndValues);
 
-        JsonNode root = mapper.readTree(this.response.toJson());
+        final JsonNode root = mapper.readTree(this.response.toJson());
         // top level objects
         assertTrue(root.has(HDR_TRANSACTION_METADATA));
         assertTrue(root.has(HDR_RESPONSE_HEADERS));
         assertTrue(root.has(HDR_CONTENT_METADATA));
         assertTrue(root.has(HDR_CONVERTED_TEXT));
 
-        JsonNode tm = root.get(HDR_TRANSACTION_METADATA);
+        final JsonNode tm = root.get(HDR_TRANSACTION_METADATA);
         assertTrue(tm.has(HDR_REQUEST_PAGE));
         assertTrue(tm.has(HDR_LANDING_PAGE));
         assertTrue(tm.has(HDR_STATUS));
@@ -83,10 +63,10 @@ public class Url2TextResponseTest
         assertTrue(tm.has(HDR_LAST_MODIFIED));
         assertTrue(tm.has(HDR_CONVERSION_TIME));
 
-        JsonNode rh = root.get(HDR_RESPONSE_HEADERS);
+        final JsonNode rh = root.get(HDR_RESPONSE_HEADERS);
         assertTrue(rh.has("key1"));
 
-        JsonNode cm = root.get(HDR_CONTENT_METADATA);
+        final JsonNode cm = root.get(HDR_CONTENT_METADATA);
         assertTrue(cm.has("key1"));
     }
 
@@ -108,14 +88,14 @@ public class Url2TextResponseTest
         this.response.setResponseHeaders(namesAndValues);
         this.response.setContentMetadata(namesAndValues);
 
-        Url2TextResponse r2 = new Url2TextResponse(this.response.toJson());
+        final Url2TextResponse r2 = new Url2TextResponse(this.response.toJson());
         assertEquals(this.response, r2);
     }
 
     @Test
     public void testEquals()
     {
-        Url2TextResponse r2 = new Url2TextResponse();
+        final Url2TextResponse r2 = new Url2TextResponse();
         assertEquals(this.response, r2);
         this.response.setContentLength(100);
         assertNotEquals(this.response, r2);
@@ -124,7 +104,7 @@ public class Url2TextResponseTest
     @Test
     public void testHashCode()
     {
-        Url2TextResponse r2 = new Url2TextResponse();
+        final Url2TextResponse r2 = new Url2TextResponse();
         assertEquals(this.response.hashCode(), r2.hashCode());
         this.response.setContentLength(100);
         assertNotEquals(this.response.hashCode(), r2.hashCode());
@@ -136,7 +116,7 @@ public class Url2TextResponseTest
         // check all fields are included
         this.response.setContentMetadata(namesAndValues);
         this.response.setResponseHeaders(namesAndValues);
-        String jsonString = this.response.toJson();
+        final String jsonString = this.response.toJson();
 
         assertTrue(jsonString.contains(HDR_TRANSACTION_METADATA));
         assertTrue(jsonString.contains(HDR_RESPONSE_HEADERS));
@@ -318,9 +298,9 @@ public class Url2TextResponseTest
     public void testSetResponseHeaders()
     {
         // check null == empty list
-        assertTrue(this.response.getResponseHeaders().size() == 0);
+        assertEquals(0, this.response.getResponseHeaders().size());
         this.response.setResponseHeaders(null);
-        assertTrue(this.response.getResponseHeaders().size() == 0);
+        assertEquals(0, this.response.getResponseHeaders().size());
         this.response.setResponseHeaders(namesAndValues);
         assertTrue(namesAndValues == this.response.getResponseHeaders());
     }
@@ -329,9 +309,9 @@ public class Url2TextResponseTest
     public void testSetContentMetadata()
     {
         // check null == empty list
-        assertTrue(this.response.getContentMetadata().size() == 0);
+        assertEquals(0, this.response.getContentMetadata().size());
         this.response.setContentMetadata(null);
-        assertTrue(this.response.getContentMetadata().size() == 0);
+        assertEquals(0, this.response.getContentMetadata().size());
         this.response.setContentMetadata(namesAndValues);
         assertTrue(namesAndValues == this.response.getContentMetadata());
     }

@@ -35,12 +35,12 @@ public class Url2TextAPITest
     @Test
     public void testSystemPropertyOveride() throws Url2TextException 
     {
-        String testKey = KEY_ACTIVEX_NATIVE;
+        final String testKey = KEY_ACTIVEX_NATIVE;
         try
         {
             System.setProperty(testKey, Boolean.TRUE.toString());
 
-            Url2Text fetcher = new Url2Text();
+            final Url2Text fetcher = new Url2Text();
             assertTrue(fetcher.hasActiveXNative());
         }
         finally
@@ -52,15 +52,15 @@ public class Url2TextAPITest
     @Test
     public void testSystemPropertiesOveride() throws Url2TextException 
     {
-        String testKey = KEY_ACTIVEX_NATIVE;
+        final String testKey = KEY_ACTIVEX_NATIVE;
         try
         {
             System.setProperty(testKey, Boolean.TRUE.toString());
 
-            Properties properties = new Properties();
+            final Properties properties = new Properties();
             properties.put(KEY_ACTIVEX_NATIVE, Boolean.FALSE.toString());
 
-            Url2Text fetcher = new Url2Text(properties);
+            final Url2Text fetcher = new Url2Text(properties);
             assertTrue(fetcher.hasActiveXNative());
         }
         finally
@@ -72,7 +72,7 @@ public class Url2TextAPITest
     @Test(expected = Url2TextException.class)
     public void testPropertiesBadValue() throws Url2TextException 
     {
-        Properties properties = new Properties();
+        final Properties properties = new Properties();
         properties.put(KEY_ACTIVEX_NATIVE, "bananas");
 
         new Url2Text(properties);
@@ -81,27 +81,27 @@ public class Url2TextAPITest
     @Test
     public void testPropertiesMixedCaseKey() throws Url2TextException 
     {
-        Properties properties = new Properties();
+        final Properties properties = new Properties();
         properties.put(KEY_ACTIVEX_NATIVE.toUpperCase(), "true");
 
         assertEquals("true", properties.getProperty(KEY_ACTIVEX_NATIVE.toUpperCase()));
         
-        Url2Text testFetcher = new Url2Text(properties);
+        final Url2Text testFetcher = new Url2Text(properties);
         assertTrue(testFetcher.hasActiveXNative());
     }
     
     @Test
     public void testSystemPropertiesOverideMixedCase() throws Url2TextException 
     {
-        String testKey = KEY_ACTIVEX_NATIVE.toUpperCase();
+        final String testKey = KEY_ACTIVEX_NATIVE.toUpperCase();
         try
         {
             System.setProperty(testKey, Boolean.TRUE.toString());
 
-            Properties properties = new Properties();
+            final Properties properties = new Properties();
             properties.put(KEY_ACTIVEX_NATIVE, Boolean.FALSE.toString());
 
-            Url2Text fetcher = new Url2Text(properties);
+            final Url2Text fetcher = new Url2Text(properties);
             assertTrue(fetcher.hasActiveXNative());
         }
         finally

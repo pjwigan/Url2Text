@@ -123,7 +123,7 @@ public class Url2Text
     // FUTURE use reflection to ensure all properties are tested.
 
     // Number of configurable properties
-    private static int PROPERTY_COUNT = URL2TEXT_PROPERTY_KEYS.length;
+    private static final int PROPERTY_COUNT = URL2TEXT_PROPERTY_KEYS.length;
 
     // HtmlUnit WebClientOptions (not set by the CLI)
     private boolean activeXNative = false;
@@ -165,13 +165,13 @@ public class Url2Text
      * 
      * @throws Url2TextException
      */
-    public Url2Text() throws Url2TextException
+    public Url2Text() throws Url2TextException 
     {
-        this(new Properties());
+        this(null);
     };
 
-    private String safeGetPropertyBoolean(Properties properties, String key,
-            boolean defaultValue) throws Url2TextException
+    private String safeGetPropertyBoolean(final Properties properties, final String key,
+            final boolean defaultValue) throws Url2TextException
     {
         String value = properties.getProperty(key, Boolean.valueOf(defaultValue).toString());
         value = value.toLowerCase(Locale.ENGLISH);
@@ -197,17 +197,17 @@ public class Url2Text
      *            can be null or empty
      * @throws Url2TextException
      */
-    public Url2Text(Properties properties) throws Url2TextException
+    public Url2Text(final Properties properties) throws Url2TextException
     {
-        Properties props = new Properties();
+        final Properties props = new Properties();
         
         if (properties != null)
         {
             // make sure keys are in lowercase
-            for (Enumeration<Object> e = properties.keys(); e.hasMoreElements();)
+            for (final Enumeration<Object> e = properties.keys(); e.hasMoreElements();)
             {
-                String key = e.nextElement().toString();            
-                String value = properties.getProperty(key);
+                final String key = e.nextElement().toString();            
+                final String value = properties.getProperty(key);
                 props.put(key.toLowerCase(Locale.ENGLISH), value);
             }
         }
@@ -219,11 +219,11 @@ public class Url2Text
         }
 
         // apply system properties, if any
-        for (Enumeration<Object> e = System.getProperties().keys(); e
+        for (final Enumeration<Object> e = System.getProperties().keys(); e
                 .hasMoreElements();)
         {
             String key = e.nextElement().toString();
-            String value = System.getProperty(key);
+            final String value = System.getProperty(key);
 
             key = key.toLowerCase(Locale.ENGLISH);
             if (Arrays.asList(URL2TEXT_PROPERTY_KEYS).contains(key))
@@ -232,48 +232,48 @@ public class Url2Text
             }
         }
 
-        String activeXNative = safeGetPropertyBoolean(props,
+        final String activeXNative = safeGetPropertyBoolean(props,
                 KEY_ACTIVEX_NATIVE, this.activeXNative);
-        String appletEnabled = safeGetPropertyBoolean(props,
+        final String appletEnabled = safeGetPropertyBoolean(props,
                 KEY_APPLET_ENABLED, this.appletEnabled);
-        String geolocationEnabled = safeGetPropertyBoolean(props,
+        final String geolocationEnabled = safeGetPropertyBoolean(props,
                 KEY_GEOLOCATION_ENABLED, this.geolocationEnabled);
-        String popupBlockerEnabled = safeGetPropertyBoolean(props,
+        final String popupBlockerEnabled = safeGetPropertyBoolean(props,
                 KEY_POPUP_BLOCKER_ENABLED, this.popupBlockerEnabled);
-        String exceptionOnScriptError = safeGetPropertyBoolean(props,
+        final String exceptionOnScriptError = safeGetPropertyBoolean(props,
                 KEY_EXCEPTION_ON_SCRIPT_ERROR, this.exceptionOnScriptError);
-        String exceptionOnFailingStatusCode = safeGetPropertyBoolean(
+        final String exceptionOnFailingStatusCode = safeGetPropertyBoolean(
                 props, KEY_EXCEPTION_ON_FAILING_STATUS,
                 this.exceptionOnFailingStatus);
-        String printContentOnFailingStatusCode = safeGetPropertyBoolean(
+        final String printContentOnFailingStatusCode = safeGetPropertyBoolean(
                 props, KEY_PRINT_CONTENT_ON_FAILING_STATUS,
                 this.printContentOnFailingStatus);
-        String cssEnabled = safeGetPropertyBoolean(props, KEY_CSS_ENABLED,
+        final String cssEnabled = safeGetPropertyBoolean(props, KEY_CSS_ENABLED,
                 this.cssEnabled);
-        String doNotTrackEnabled = safeGetPropertyBoolean(props,
+        final String doNotTrackEnabled = safeGetPropertyBoolean(props,
                 KEY_DO_NOT_TRACK_ENABLED, this.doNotTrackEnabled);
-        String javascriptEnabled = safeGetPropertyBoolean(props,
+        final String javascriptEnabled = safeGetPropertyBoolean(props,
                 KEY_JAVASCRIPT_ENABLED, this.javascriptEnabled);
-        String useInsecureSSL = safeGetPropertyBoolean(props,
+        final String useInsecureSSL = safeGetPropertyBoolean(props,
                 KEY_USE_INSECURE_SSL, this.useInsecureSSL);
-        String redirectEnabled = safeGetPropertyBoolean(props,
+        final String redirectEnabled = safeGetPropertyBoolean(props,
                 KEY_REDIRECT_ENABLED, this.redirectEnabled);
-        String cookiesEnabled = safeGetPropertyBoolean(props,
+        final String cookiesEnabled = safeGetPropertyBoolean(props,
                 KEY_COOKIES_ENABLED, this.cookiesEnabled);
-        String clearCookies = safeGetPropertyBoolean(props,
+        final String clearCookies = safeGetPropertyBoolean(props,
                 KEY_CLEAR_COOKIES, this.clearCookies);
-        String clearExpiredCookies = safeGetPropertyBoolean(props,
+        final String clearExpiredCookies = safeGetPropertyBoolean(props,
                 KEY_CLEAR_EXPIRED_COOKIES, this.clearExpiredCookies);
-        String includeHeaders = safeGetPropertyBoolean(props,
+        final String includeHeaders = safeGetPropertyBoolean(props,
                 KEY_INCLUDE_HEADERS, this.includeHeaders);
-        String includeMetadata = safeGetPropertyBoolean(props,
+        final String includeMetadata = safeGetPropertyBoolean(props,
                 KEY_INCLUDE_METADATA, this.includeMetadata);
-        String networkTimeout = props.getProperty(KEY_NETWORK_TIMEOUT,
+        final String networkTimeout = props.getProperty(KEY_NETWORK_TIMEOUT,
                 Integer.valueOf(this.networkTimeout).toString());
-        String javascriptTimeout = props.getProperty(
+        final String javascriptTimeout = props.getProperty(
                 KEY_JAVASCRIPT_TIMEOUT, Integer.valueOf(this.javascriptTimeout)
                         .toString());
-        String maxContentLength = props.getProperty(
+        final String maxContentLength = props.getProperty(
                 KEY_MAX_CONTENT_LENGTH, Long.valueOf(this.maxContentLength)
                         .toString());
 
@@ -312,7 +312,7 @@ public class Url2Text
      */
     public Properties configAsProperties()
     {
-        Properties properties = new Properties();
+        final Properties properties = new Properties();
 
         properties.setProperty(KEY_ACTIVEX_NATIVE,
                 Boolean.valueOf(this.activeXNative).toString());
@@ -381,17 +381,21 @@ public class Url2Text
     @Override
     public boolean equals(final Object obj)
     {
+        boolean result = false;
         if (this == obj)
         {
-            return true;
+            result = true;
         }
-        if (obj == null || obj.getClass() != this.getClass())
+        else if (obj == null || obj.getClass() != this.getClass())
         {
-            return false;
+            result = false;
         }
-        final Url2Text test = (Url2Text) obj;
-        // all content is included in properties, so this is safe.
-        return test.configAsProperties().equals(this.configAsProperties());
+        else {
+            final Url2Text test = (Url2Text) obj;
+            // all content is included in properties, so this is safe.
+            result = test.configAsProperties().equals(this.configAsProperties());
+        }
+        return result;
     }
 
     /**
@@ -401,7 +405,7 @@ public class Url2Text
      */
     private WebClient prepareWebClient()
     {
-        WebClient client = new WebClient(BrowserVersion.FIREFOX_24);
+        final WebClient client = new WebClient(BrowserVersion.FIREFOX_24);
 
         if (this.javascriptTimeout > 0)
         {
@@ -425,17 +429,17 @@ public class Url2Text
         options.setTimeout(this.networkTimeout * 1_000);
 
         // configure cookies
-        final CookieManager co = client.getCookieManager();
-        co.setCookiesEnabled(this.cookiesEnabled);
+        final CookieManager cookieManager = client.getCookieManager();
+        cookieManager.setCookiesEnabled(this.cookiesEnabled);
         if (this.cookiesEnabled)
         {
             if (this.clearCookies)
             {
-                co.clearCookies();
+                cookieManager.clearCookies();
             }
             else if (this.clearExpiredCookies)
             {
-                co.clearExpired(new Date());
+                cookieManager.clearExpired(new Date());
             }
         }
 
@@ -459,7 +463,7 @@ public class Url2Text
             // test for docBook
             String nameSpace = xmlPage.getXmlDocument().getDocumentElement()
                     .getNamespaceURI();
-            DocumentType documentType = xmlPage.getXmlDocument().getDoctype();
+            final DocumentType documentType = xmlPage.getXmlDocument().getDoctype();
             if (documentType != null)
             {
                 final String publicId = documentType.getPublicId();
@@ -511,7 +515,7 @@ public class Url2Text
     private WebRequest prepareRequest(final URL requestUrl,
             final Map<String, String> additionalHeaders)
     {
-        WebRequest request = new WebRequest(requestUrl, HttpMethod.GET);
+        final WebRequest request = new WebRequest(requestUrl, HttpMethod.GET);
 
         request.setCharset(UTF_8);
 

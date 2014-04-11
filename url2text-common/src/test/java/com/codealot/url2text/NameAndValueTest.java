@@ -6,7 +6,7 @@ import org.junit.Test;
 
 public class NameAndValueTest {
     
-    private NameAndValue namesAndValues = new NameAndValue();
+    private final NameAndValue namesAndValues = new NameAndValue();
 
     @Test
     public void testNameAndValue() {

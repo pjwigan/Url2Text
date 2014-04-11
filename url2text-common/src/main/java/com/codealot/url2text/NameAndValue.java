@@ -2,6 +2,8 @@ package com.codealot.url2text;
 
 import static com.codealot.url2text.Constants.*;
 
+import java.io.Serializable;
+
 /**
  * Avoids a heavyweight dependency.
  * <p>
@@ -27,7 +29,8 @@ import static com.codealot.url2text.Constants.*;
  *         implied. See the License for the specific language governing
  *         permissions and limitations under the License.
  */
-public class NameAndValue
+@SuppressWarnings("serial")
+public class NameAndValue implements Serializable
 {
     private String name = STR_NOT_SET;
     private String value = STR_NOT_SET;

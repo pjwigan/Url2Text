@@ -14,6 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.codealot.url2text.Url2Text;
+import com.codealot.url2text.Url2TextException;
 import com.codealot.url2text.Url2TextResponse;
 import com.codealot.url2text.Constants.OutputFormat;
 
@@ -99,6 +100,7 @@ public class Application {
      * 
      * @param args
      *            command line arguments
+     * @throws Url2TextException 
      */
     public static void main(final String[] args) {
 
@@ -128,7 +130,16 @@ public class Application {
         }
 
         // create operational object
-        final Url2Text fetcher = new Url2Text();
+        Url2Text fetcher = null;
+        try
+        {
+            fetcher = new Url2Text();
+        }
+        catch (Url2TextException e1)
+        {
+            LOG.error("Error creating Url2Text instance.", e1);
+            System.exit(9);
+        }
 
         // configure object
         if (options.has(CSS)) {
