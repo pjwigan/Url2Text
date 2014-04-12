@@ -26,18 +26,19 @@
 <!--        <url>http://svn.apache.org/viewcvs.cgi/maven</url>-->
 <!--        <connection>http://svn.apache.org/viewcvs.cgi/maven</connection>-->
 <!--    </scm>-->
-<!--    <developers>-->
-<!--        <developer>-->
-<!--            <id>...</id>-->
-<!--            <name>Peter Jacobs</name>-->
-<!--            <email>peter.jacobs@codealot.com</email>-->
-<!--        </developer>-->
-<!--    </developers>-->
+    <developers>
+        <developer>
+            <id>jacobsp</id>
+            <name>Peter Jacobs</name>
+            <email>peter.jacobs@codealot.com</email>
+        </developer>
+    </developers>
 
 	<modules>
 		<module>url2text-common</module>
 		<module>url2text-core</module>
 		<module>url2text-cli</module>
+		<module>textStore</module>
 	</modules>
 
 	<properties>

@@ -120,7 +120,8 @@ public class Url2Text
     // ##### PROPERTIES #####
     // ######################
 
-    // FUTURE use reflection to ensure all properties are tested.
+    // FUTURE use reflection to ensure all properties are tested, included in
+    // equals() and hashCode() etc.
 
     // Number of configurable properties
     private static final int PROPERTY_COUNT = URL2TEXT_PROPERTY_KEYS.length;
@@ -188,13 +189,15 @@ public class Url2Text
 
         if (properties != null)
         {
-            // make sure keys are known and in lowercase
+            // make sure keys are in lowercase
             for (final Enumeration<Object> e = properties.keys(); e
                     .hasMoreElements();)
             {
                 String key = e.nextElement().toString();
                 final String value = properties.getProperty(key);
+                
                 key = key.toLowerCase(Locale.ENGLISH);
+                // check key is known
                 if (!keys.contains(key))
                 {
                     throw new IllegalArgumentException(
