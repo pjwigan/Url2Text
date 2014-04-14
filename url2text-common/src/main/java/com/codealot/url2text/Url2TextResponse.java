@@ -67,7 +67,7 @@ public class Url2TextResponse implements Serializable
     private List<NameAndValue> contentMetadata = new ArrayList<>();
 
     // resulting text
-    private String convertedText = STR_NOT_SET;
+    private String convertedText = STR_NOT_SET;    
 
     // constructor
     public Url2TextResponse()

@@ -16,23 +16,22 @@ public class FileStoreTest
 {
     private Path storeRoot;
     private FileStore fileStore;
-    
-    
+
     @Before
-    public void setUp() throws IOException 
+    public void setUp() throws IOException
     {
         this.storeRoot = Files.createTempDirectory("FileStore-");
         this.fileStore = new FileStore(storeRoot);
     }
-    
+
     @After
-    public void tearDown() throws IOException 
+    public void tearDown() throws IOException
     {
-        if (this.storeRoot != null) 
+        if (this.storeRoot != null)
         {
             // dir must be empty
             File[] files = storeRoot.toFile().listFiles();
-            for(int i=0; i<files.length; i++) 
+            for (int i = 0; i < files.length; i++)
             {
                 files[i].delete();
             }
@@ -76,12 +75,15 @@ public class FileStoreTest
     public void testFileStore() throws IOException
     {
         Path isADir = null;
-        try {
+        try
+        {
             isADir = Files.createTempDirectory("fs");
             new FileStore(isADir);
         }
-        finally {
-            if (isADir != null) {
+        finally
+        {
+            if (isADir != null)
+            {
                 Files.deleteIfExists(isADir);
             }
         }
@@ -134,19 +136,19 @@ public class FileStoreTest
     @Test(expected = NullPointerException.class)
     public void testStoreTextNull() throws IOException
     {
-        fileStore.storeText(null);    
+        fileStore.storeText(null);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testStoreTextEmpty() throws IOException
     {
-        fileStore.storeText("");    
+        fileStore.storeText("");
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testStoreTextWhitespace() throws IOException
     {
-        fileStore.storeText("           \n\r\t");    
+        fileStore.storeText("           \n\r\t");
     }
 
     @Test
@@ -168,23 +170,25 @@ public class FileStoreTest
     {
         fileStore.deleteText("");
     }
-    
+
     @Test(expected = IllegalArgumentException.class)
     public void testDeleteTextShortId() throws IOException
     {
         fileStore.deleteText("ABCDEF12345");
     }
-    
+
     @Test(expected = IllegalArgumentException.class)
     public void testDeleteTextLongId() throws IOException
     {
-        fileStore.deleteText("123456789012345678901234567890123456789012345");    }
-    
+        fileStore.deleteText("123456789012345678901234567890123456789012345");
+    }
+
     @Test(expected = IllegalArgumentException.class)
     public void testDeleteTextNotHexId() throws IOException
     {
-        fileStore.deleteText("123456789012345678901234567890123456789Z");    }
-    
+        fileStore.deleteText("123456789012345678901234567890123456789Z");
+    }
+
     @Test
     public void testDeleteText() throws IOException
     {

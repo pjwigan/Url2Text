@@ -13,11 +13,12 @@ import org.junit.Test;
 
 import com.codealot.url2text.cli.Application;
 
-public class ApplicationTest {
+public class ApplicationTest
+{
 
     @Test
-    public void testParseARgsNoOpts() throws IOException {
-
+    public void testParseARgsNoOpts() throws IOException
+    {
         String[] args = {};
         OptionSet options = Application.parseArgs(args);
         assertEquals(false, options.has(Application.CSS));
@@ -35,8 +36,8 @@ public class ApplicationTest {
     }
 
     @Test
-    public void testParseArgsBooleanOpts() throws IOException {
-
+    public void testParseArgsBooleanOpts() throws IOException
+    {
         String[] args = { "--css", "--do-not-track", "--include-headers",
                 "--include-metadata", "--insecure-ssl", "--javascript",
                 "--no-cookies", "--no-redirect" };
@@ -52,41 +53,43 @@ public class ApplicationTest {
     }
 
     @Test(expected = OptionException.class)
-    public void testParseArgsOutputFormatRequired() throws IOException {
-
+    public void testParseArgsOutputFormatRequired() throws IOException
+    {
         String[] args = { "--output-format" };
         Application.parseArgs(args);
     }
 
     @Test
-    public void testParseArgsOutputFormat() throws IOException {
-
+    public void testParseArgsOutputFormat() throws IOException
+    {
         OptionSet options = Application.parseArgs(new String[] {
                 "--output-format", OutputFormat.PLAIN.toString() });
-        assertEquals(OutputFormat.PLAIN, options.valueOf(Application.OUTPUT_FORMAT));
+        assertEquals(OutputFormat.PLAIN,
+                options.valueOf(Application.OUTPUT_FORMAT));
 
         options = Application.parseArgs(new String[] { "--output-format",
                 OutputFormat.JSON.toString() });
-        assertEquals(OutputFormat.JSON, options.valueOf(Application.OUTPUT_FORMAT));
+        assertEquals(OutputFormat.JSON,
+                options.valueOf(Application.OUTPUT_FORMAT));
     }
 
     @Test(expected = OptionException.class)
-    public void testParseArgsOutputFileRequired() throws IOException {
-
+    public void testParseArgsOutputFileRequired() throws IOException
+    {
         String[] args = { "--output-file" };
         Application.parseArgs(args);
     }
 
     @Test(expected = OptionException.class)
-    public void testParseArgsMaxLengthRequired() throws IOException {
-
+    public void testParseArgsMaxLengthRequired() throws IOException
+    {
         String[] args = { "--max-length" };
         Application.parseArgs(args);
     }
 
     @Test
-    public void testParseArgsOutputFile() throws IOException {
-
+    public void testParseArgsOutputFile() throws IOException
+    {
         String[] args = { "--output-file", "path.out" };
         OptionSet options = Application.parseArgs(args);
         File f = (File) options.valueOf(Application.OUTPUT_FILE);
@@ -94,56 +97,78 @@ public class ApplicationTest {
     }
 
     @Test(expected = OptionException.class)
-    public void testParseArgsTimeoutRequired() throws IOException {
+    public void testParseArgsJSTimeoutRequired() throws IOException
+    {
+        String[] args = { "--javascript-timeout" };
+        Application.parseArgs(args);
+    }
 
+    @Test(expected = OptionException.class)
+    public void testParseArgsJSTimeoutNotInt() throws IOException
+    {
+        String[] args = { "--javascript-timeout", "bananas" };
+        OptionSet options = Application.parseArgs(args);
+        options.valueOf(Application.JAVASCRIPT_TIMEOUT);
+    }
+
+    @Test
+    public void testParseArgsJSTimeout() throws IOException
+    {
+        String[] args = { "--javascript-timeout", "50" };
+        OptionSet options = Application.parseArgs(args);
+        assertEquals(50, options.valueOf(Application.JAVASCRIPT_TIMEOUT));
+    }
+
+    @Test(expected = OptionException.class)
+    public void testParseArgsTimeoutRequired() throws IOException
+    {
         String[] args = { "--http-timeout" };
         Application.parseArgs(args);
     }
 
     @Test(expected = OptionException.class)
-    public void testParseArgsTimeoutNotInt() throws IOException {
-
+    public void testParseArgsTimeoutNotInt() throws IOException
+    {
         String[] args = { "--http-timeout", "bananas" };
         OptionSet options = Application.parseArgs(args);
         options.valueOf(Application.HTTP_TIMEOUT);
     }
 
     @Test
-    public void testParseArgsTimeout() throws IOException {
-
+    public void testParseArgsTimeout() throws IOException
+    {
         String[] args = { "--http-timeout", "50" };
         OptionSet options = Application.parseArgs(args);
         assertEquals(50, options.valueOf(Application.HTTP_TIMEOUT));
     }
 
     @Test(expected = OptionException.class)
-    public void testParseArgsMaxLengthNotInt() throws IOException {
-
+    public void testParseArgsMaxLengthNotInt() throws IOException
+    {
         String[] args = { "--max-length", "bananas" };
         OptionSet options = Application.parseArgs(args);
         options.valueOf(Application.MAX_LENGTH);
     }
 
     @Test
-    public void testParseArgsMaxLength() throws IOException {
-
+    public void testParseArgsMaxLength() throws IOException
+    {
         String[] args = { "--max-length", "50" };
         OptionSet options = Application.parseArgs(args);
         long val = (long) options.valueOf(Application.MAX_LENGTH);
         assertEquals(50L, val);
     }
-    
+
     /**
      * Was present in earlier versions but has been removed.
      * 
      * @throws IOException
      */
     @Test(expected = OptionException.class)
-    public void testParseArgsLogLevelRequired() throws IOException {
-
+    public void testParseArgsLogLevelRequired() throws IOException
+    {
         String[] args = { "--log-level" };
         Application.parseArgs(args);
     }
-
 
 }

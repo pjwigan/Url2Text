@@ -16,14 +16,13 @@ import org.slf4j.LoggerFactory;
 import com.codealot.url2text.Url2Text;
 import com.codealot.url2text.Url2TextException;
 import com.codealot.url2text.Url2TextResponse;
-import com.codealot.url2text.Constants.OutputFormat;
 
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
 
 /**
- * Command line utility to fetch the content of a URL as text, with
- * optional metadata, in plain text, JSON, or XML format.
+ * Command line utility to fetch the content of a URL as text, with optional
+ * metadata, in plain text, JSON, or XML format.
  * <p>
  * For usage see {@link #main(String[])}.
  * 
@@ -45,13 +44,15 @@ import joptsimple.OptionSet;
  *         implied. See the License for the specific language governing
  *         permissions and limitations under the License.
  */
-public class Application {
+public class Application
+{
 
     // FUTURE add Url2Text as the parent POM
-    
+
     public static final String CSS = "css";
     public static final String DO_NOT_TRACK = "do-not-track";
     public static final String JAVASCRIPT = "javascript";
+    public static final String JAVASCRIPT_TIMEOUT = "javascript-timeout";
     public static final String INSECURE_SSL = "insecure-ssl";
     public static final String NO_REDIRECT = "no-redirect";
     public static final String NO_COOKIES = "no-cookies";
@@ -63,7 +64,7 @@ public class Application {
     public static final String OUTPUT_FILE = "output-file";
     public static final String VERSION = "version";
     public static final String HELP = "help";
-    
+
     // SLF4J logger instance
     private static final Logger LOG = LoggerFactory
             .getLogger(Application.class);
@@ -78,53 +79,65 @@ public class Application {
      * 
      * The following command line options are available:
      * 
-     *  Option                             Description                        
-     *  ------                             -----------                        
-     *  -?, -h, --help                     show help                          
-     *  --css                              Enable CSS support                 
-     *  --do-not-track                     Enable Do Not Track support        
-     *  --http-timeout <Integer: seconds>  HTTP transaction timeout
-     *  --include-headers                  Include HTTP response headers      
-     *  --include-metadata                 Include content metadata           
-     *  --insecure-ssl                     Ignore server certificates         
-     *  --javascript                       Enable Javascript
-     *  --max-length                       Maximum Content-Length                  
-     *  --no-cookies                       Disable cookie support             
-     *  --no-redirect                      Disable redirection                
-     *  --output-file <File: file>         File to receive output               
-     *  --output-format                    One of PLAIN, JSON                     
-     *  --version                          Print version to stdout
+     *  Option                                  Description                        
+     *  ------                                  -----------                        
+     *  -?, -h, --help                          show help                          
+     *  --css                                   Enable CSS support                 
+     *  --do-not-track                          Enable Do Not Track support        
+     *  --http-timeout <Integer: seconds>       HTTP transaction timeout
+     *  --include-headers                       Include HTTP response headers      
+     *  --include-metadata                      Include content metadata           
+     *  --insecure-ssl                          Ignore server certificates         
+     *  --javascript                            Enable Javascript
+     *  --javascript-timeout <Integer: seconds> Javascript execution timeout               
+     *  --max-length                            Maximum Content-Length                  
+     *  --no-cookies                            Disable cookie support             
+     *  --no-redirect                           Disable redirection                
+     *  --output-file <File: file>              File to receive output         
+     *  --output-format                         One of PLAIN, JSON                     
+     *  --version                               Print version to stdout
      * </pre>
      * 
      * </blockquote>
      * 
      * @param args
      *            command line arguments
-     * @throws Url2TextException 
+     * @throws Url2TextException
      */
-    public static void main(final String[] args) {
+    public static void main(final String[] args)
+    {
+        // TODO extra output form, "split-output", which writes
+        // <output-file>.text (always text/plain UTF-8
+        // <output-file>.metadata (as output-format)
+
+        // TODO add option to specify Url2Text properties file
 
         // parse the options
         OptionSet options = null;
-        try {
+        try
+        {
             options = parseArgs(args);
         }
-        catch (IOException e1) {
+        catch (IOException e1)
+        {
             LOG.error("Error processing command line.");
             System.exit(2);
         }
 
         // make sure url is a URL
         final List<?> nonopts = options.nonOptionArguments();
-        if (nonopts.size() != 1) {
+        if (nonopts.size() != 1)
+        {
             LOG.error("Command line incomplete or ambiguous");
             System.exit(1);
         }
         URL url = null;
-        try {
+        try
+        {
             url = new URL(nonopts.get(0).toString());
         }
-        catch (MalformedURLException e) {
+        catch (MalformedURLException e)
+        {
             LOG.error(nonopts.get(0).toString() + " not a valid URL.", e);
             System.exit(5);
         }
@@ -142,62 +155,84 @@ public class Application {
         }
 
         // configure object
-        if (options.has(CSS)) {
+        if (options.has(CSS))
+        {
             fetcher.setCssEnabled(true);
         }
-        if (options.has(DO_NOT_TRACK)) {
+        if (options.has(DO_NOT_TRACK))
+        {
             fetcher.setDoNotTrackEnabled(true);
         }
-        if (options.has(JAVASCRIPT)) {
+        if (options.has(JAVASCRIPT))
+        {
             fetcher.setJavascriptEnabled(true);
         }
-        if (options.has(INSECURE_SSL)) {
+        if (options.has(INSECURE_SSL))
+        {
             fetcher.setUseInsecureSSL(true);
         }
-        if (options.has(NO_REDIRECT)) {
+        if (options.has(NO_REDIRECT))
+        {
             fetcher.setRedirectEnabled(false);
         }
-        if (options.has(NO_COOKIES)) {
+        if (options.has(NO_COOKIES))
+        {
             fetcher.setCookiesEnabled(false);
         }
-        if (options.has(INCLUDE_HEADERS)) {
+        if (options.has(INCLUDE_HEADERS))
+        {
             fetcher.setIncludeHeaders(true);
         }
-        if (options.has(INCLUDE_METADATA)) {
+        if (options.has(INCLUDE_METADATA))
+        {
             fetcher.setIncludeMetadata(true);
         }
-        if (options.has(HTTP_TIMEOUT)) {
+        if (options.has(HTTP_TIMEOUT))
+        {
             final Integer timeout = (Integer) options.valueOf(HTTP_TIMEOUT);
             fetcher.setNetworkTimeout(timeout);
         }
-        if (options.has(MAX_LENGTH)) {
+        if (options.has(JAVASCRIPT_TIMEOUT))
+        {
+            final Integer timeout = (Integer) options
+                    .valueOf(JAVASCRIPT_TIMEOUT);
+            fetcher.setJavascriptTimeout(timeout);
+        }
+        if (options.has(MAX_LENGTH))
+        {
             final Long maxLength = (Long) options.valueOf(MAX_LENGTH);
             fetcher.setMaxContentLength(maxLength);
         }
-        
+
         // determine output format
         OutputFormat outputFormat = OutputFormat.PLAIN;
-        if (options.has(OUTPUT_FORMAT)) {
+        if (options.has(OUTPUT_FORMAT))
+        {
             outputFormat = (OutputFormat) options.valueOf(OUTPUT_FORMAT);
         }
 
         // issue fetch command
-        try {
-            Url2TextResponse response = fetcher.contentAsText(url, null);
-            
-            if (options.has(OUTPUT_FILE)) {
+        try
+        {
+            final Url2TextResponse response = fetcher.contentAsText(url, null);
+
+            if (options.has(OUTPUT_FILE))
+            {
                 // output to output-file
                 try (PrintWriter out = new PrintWriter(
-                        (File) options.valueOf(OUTPUT_FILE))) {
-                    
+                        (File) options.valueOf(OUTPUT_FILE)))
+                {
+
                     out.print(response.asFormat(outputFormat));
                 }
             }
-            else {
+            else
+            {
                 System.out.print(response.asFormat(outputFormat));
             }
         }
-        catch (Exception e) {
+        catch (Exception e)
+        {
             LOG.error("Error producing output.", e);
             System.exit(8);
         }
@@ -211,45 +246,52 @@ public class Application {
      * @throws IOException
      */
     protected static OptionSet parseArgs(final String[] args)
-            throws IOException {
+            throws IOException
+    {
 
-        final OptionParser parser = new OptionParser() {
+        final OptionParser parser = new OptionParser()
             {
-                accepts(CSS, "Enable CSS support");
-                accepts(DO_NOT_TRACK, "Enable Do Not Track support");
-                accepts(JAVASCRIPT, "Enable Javascript");
-                accepts(NO_REDIRECT, "Disable redirection");
-                accepts(INSECURE_SSL, "Ignore server certificates");
-                accepts(NO_COOKIES, "Disable cookie support");
-                accepts(INCLUDE_HEADERS, "Include HTTP response headers");
-                accepts(INCLUDE_METADATA, "Include content metadata");
-                accepts(OUTPUT_FORMAT, "One of PLAIN, JSON")
-                        .withRequiredArg().ofType(OutputFormat.class);
-                accepts(OUTPUT_FILE, "File to receive output")
-                        .withRequiredArg().ofType(File.class)
-                        .describedAs("file");
-                accepts(HTTP_TIMEOUT, "HTTP transaction timeout")
-                        .withRequiredArg().ofType(Integer.class)
-                        .describedAs("seconds");
-                accepts(MAX_LENGTH, "Maximum Content-Length").withRequiredArg()
-                        .ofType(Long.class);
+                {
+                    accepts(CSS, "Enable CSS support");
+                    accepts(DO_NOT_TRACK, "Enable Do Not Track support");
+                    accepts(JAVASCRIPT, "Enable Javascript");
+                    accepts(NO_REDIRECT, "Disable redirection");
+                    accepts(INSECURE_SSL, "Ignore server certificates");
+                    accepts(NO_COOKIES, "Disable cookie support");
+                    accepts(INCLUDE_HEADERS, "Include HTTP response headers");
+                    accepts(INCLUDE_METADATA, "Include content metadata");
+                    accepts(OUTPUT_FORMAT, "One of PLAIN, JSON")
+                            .withRequiredArg().ofType(OutputFormat.class);
+                    accepts(OUTPUT_FILE, "File to receive output")
+                            .withRequiredArg().ofType(File.class)
+                            .describedAs("path");
+                    accepts(HTTP_TIMEOUT, "HTTP transaction timeout")
+                            .withRequiredArg().ofType(Integer.class)
+                            .describedAs("seconds");
+                    accepts(JAVASCRIPT_TIMEOUT, "Javascript execution timeout")
+                            .withRequiredArg().ofType(Integer.class)
+                            .describedAs("seconds");
+                    accepts(MAX_LENGTH, "Maximum Content-Length")
+                            .withRequiredArg().ofType(Long.class);
 
-                // following are non-operational options
-                acceptsAll(asList("h", "?", "help"), "show help").forHelp();
-                accepts(VERSION, "Print version to stdout");
-            }
-        };
+                    // following are non-operational options
+                    acceptsAll(asList("h", "?", "help"), "show help").forHelp();
+                    accepts(VERSION, "Print version to stdout");
+                }
+            };
         parser.posixlyCorrect(true);
 
         // parse the options
         final OptionSet options = parser.parse(args);
 
         // deal with the non-operational options
-        if (options.has(HELP)) {
+        if (options.has(HELP))
+        {
             parser.printHelpOn(System.out);
             System.exit(0);
         }
-        if (options.has(VERSION)) {
+        if (options.has(VERSION))
+        {
             System.out.println(APP_VERSION);
             System.exit(0);
         }

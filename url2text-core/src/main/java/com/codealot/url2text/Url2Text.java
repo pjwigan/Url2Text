@@ -112,6 +112,8 @@ public class Url2Text
     // FUTURE add http proxy support
 
     // FUTURE add credential support
+    
+    // FUTURE deal with files of unknown length
 
     // SLF4J logger instance
     private static final Logger LOG = LoggerFactory.getLogger(Url2Text.class);

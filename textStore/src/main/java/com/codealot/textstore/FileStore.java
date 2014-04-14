@@ -17,8 +17,8 @@ import java.util.Objects;
  * hash. This hex is also the text id. All files are stored in a directory set
  * during construction.
  * <p>
- * Although it should be possible to have multiple instances of this class
- * using the same storage path, this is not recommended.
+ * Although it should be possible to have multiple instances of this class using
+ * the same storage path, this is not recommended.
  * 
  * @author jacobsp
  * 
@@ -80,11 +80,12 @@ public class FileStore implements TextStoreAPI
     public String storeText(final String text) throws IOException
     {
         Objects.requireNonNull(text, "No text provided");
-        String trimmedText = text.trim();
-        if (trimmedText.length() == 0) {
-            throw new IllegalArgumentException("Text consists only of whitespace or is empty.");
+        final String trimmedText = text.trim();
+        if (trimmedText.length() == 0)
+        {
+            throw new IllegalArgumentException(
+                    "Text consists only of whitespace or is empty.");
         }
-        final byte[] textBytes = trimmedText.getBytes(StandardCharsets.UTF_8);
 
         // make the digest
         MessageDigest crypt = null;
@@ -96,6 +97,7 @@ public class FileStore implements TextStoreAPI
         {
             throw new IllegalStateException(e);
         }
+        final byte[] textBytes = trimmedText.getBytes(StandardCharsets.UTF_8);
         crypt.update(textBytes);
         final String hash = byteToHex(crypt.digest());
 
@@ -123,15 +125,15 @@ public class FileStore implements TextStoreAPI
     public void deleteText(final String hash) throws IOException
     {
         checkHash(hash);
-        
+
         final Path textPath = Paths.get(this.storeRoot, hash);
         Files.delete(textPath);
     }
-    
-    private void checkHash(String hash) 
+
+    private void checkHash(final String hash)
     {
         Objects.requireNonNull(hash, "No id provided");
-        if (!hash.matches("[A-F0-9]{40}")) 
+        if (!hash.matches("[A-F0-9]{40}"))
         {
             throw new IllegalArgumentException("Bad id: " + hash);
         }
