@@ -30,11 +30,11 @@ Basic use is:
     import com.codealot.url2text.Url2TextResponse;    
     ...
     Url2Text fetch = new Url2Text();
-    try {      
-        fetch.setJavascriptEnabled(true);
-        fetch.setIncludeHeaders(true);
-        ...
-        Url2TextResponse response = fetch.contentAsText("http://example.com");
+    fetch.setJavascriptEnabled(true);
+    fetch.setIncludeHeaders(true);
+    ...
+    try (Url2TextResponse response = fetch.contentAsText("http://example.com")) 
+    {              
         if (response.getStatus() == 200) {
             return response.toJson();
         }
@@ -42,13 +42,13 @@ Basic use is:
         ...
     }
 
-The `Url2TextResponse` object is a POJO encapsulating the fetched text, metadata, headers, etc.  
+The `Url2TextResponse` object encapsulates the fetched text (as a Reader), metadata, headers, etc.  
 
 *Currently Url2Text emulates FireFox.  (This project was inspired by a need to act as a proxy for a human user).  This may be made configurable in a future version.*
 
 Most of the HtmlUnit `WebClientOptions` and `CookieManager` features are exposed as properties of the Url2Text class.  Headers can also be added to the `WebRequest`.
 
-No transient state is stored in the `Url2Text` instance, so they can be reused safely.
+No transient state is stored in the `Url2Text` instances, so they can be reused safely.
 
 
 LICENSE

@@ -27,22 +27,23 @@ Basic usage is of the form:
 
 The following command line options are available:
 
-    Option                             Description                        
-    ------                             -----------                        
-    -?, -h, --help                     show help                          
-    --css                              Enable CSS support                 
-    --do-not-track                     Enable Do Not Track support        
-    --http-timeout <Integer: seconds>  HTTP transaction timeout
-    --include-headers                  Include HTTP response headers      
-    --include-metadata                 Include content metadata
-    --insecure-ssl                     Ignore server certificates         
-    --javascript                       Enable Javascript                  
-    --max-length                       Maximum Content-Length
-    --no-cookies                       Disable cookie support             
-    --no-redirect                      Disable redirection                
-    --output-file <File: file>         File to receive output               
-    --output-format                    One of PLAIN, JSON                     
-    --version                          Print version to stdout            
+    Option                                  Description                        
+    ------                                  -----------                        
+    -?, -h, --help                          show help                          
+    --css                                   Enable CSS support                 
+    --do-not-track                          Enable Do Not Track support        
+    --http-timeout <Integer: seconds>       HTTP transaction timeout
+    --include-headers                       Include HTTP response headers      
+    --include-metadata                      Include content metadata
+    --insecure-ssl                          Ignore server certificates         
+    --javascript                            Enable Javascript        
+    --javascript-timeout <Integer: seconds> Javascript execution timeout          
+    --max-length                            Maximum Content-Length
+    --no-cookies                            Disable cookie support             
+    --no-redirect                           Disable redirection                
+    --output-file <File: file>              File to receive output               
+    --output-format                         One of PLAIN, JSON                     
+    --version                               Print version to stdout            
 
 Note the `http-timeout` is applied twice; once for connection and separately for data retrieval.  Thus the actual delay before aborting a slow transaction could be up to twice the period given.  Default is 90 seconds.  Use zero for infinite timeout.
 

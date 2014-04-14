@@ -3,8 +3,11 @@ package com.codealot.url2text;
 import static com.codealot.url2text.Constants.*;
 
 import java.io.ByteArrayOutputStream;
+import java.io.Closeable;
+import java.io.IOError;
 import java.io.IOException;
-import java.io.Serializable;
+import java.io.Reader;
+import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -20,7 +23,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * Class to encapsulate the result of fetching and converting a url's content.
- * Consists of a bunch of properties plus asFormat(), toString() and toJson() 
+ * Consists of a bunch of properties plus asFormat(), toString() and toJson()
  * methods.
  * 
  * <p>
@@ -46,8 +49,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  *         implied. See the License for the specific language governing
  *         permissions and limitations under the License.
  */
-@SuppressWarnings("serial")
-public class Url2TextResponse implements Serializable
+public class Url2TextResponse implements Closeable, AutoCloseable
 {
     // transaction metadata
     private String requestPage = STR_NOT_SET;
@@ -67,7 +69,8 @@ public class Url2TextResponse implements Serializable
     private List<NameAndValue> contentMetadata = new ArrayList<>();
 
     // resulting text
-    private String convertedText = STR_NOT_SET;    
+    private Reader textReader = new StringReader(STR_NOT_SET);
+    private String text = null;
 
     // constructor
     public Url2TextResponse()
@@ -93,10 +96,12 @@ public class Url2TextResponse implements Serializable
         this.requestPage = transactionNode.get(HDR_REQUEST_PAGE).textValue();
         this.landingPage = transactionNode.get(HDR_LANDING_PAGE).textValue();
         this.status = transactionNode.get(HDR_STATUS).asInt();
-        this.statusMessage = transactionNode.get(HDR_STATUS_MESSAGE).textValue();
+        this.statusMessage = transactionNode.get(HDR_STATUS_MESSAGE)
+                .textValue();
         this.fetchTime = transactionNode.get(HDR_FETCH_TIME).asLong();
         this.contentType = transactionNode.get(HDR_CONTENT_TYPE).textValue();
-        this.contentCharset = transactionNode.get(HDR_CONTENT_CHARSET).textValue();
+        this.contentCharset = transactionNode.get(HDR_CONTENT_CHARSET)
+                .textValue();
         this.contentLength = transactionNode.get(HDR_CONTENT_LENGTH).asLong();
         this.etag = transactionNode.get(HDR_ETAG).textValue();
         this.lastModified = transactionNode.get(HDR_LAST_MODIFIED).textValue();
@@ -118,7 +123,8 @@ public class Url2TextResponse implements Serializable
             this.contentMetadata.add(new NameAndValue(key, value));
         }
 
-        this.convertedText = rootNode.get(HDR_CONVERTED_TEXT).textValue();
+        this.textReader = new StringReader(rootNode.get(HDR_CONVERTED_TEXT)
+                .textValue());
     }
 
     /**
@@ -138,31 +144,44 @@ public class Url2TextResponse implements Serializable
         {
             result = this.toJson();
         }
-        else {
+        else
+        {
             throw new IllegalArgumentException("Format " + format
-                + " not supported.");
+                    + " not supported.");
         }
         return result;
+    }
+
+    /**
+     * Closes the text Reader.
+     * 
+     * @throws IOException
+     */
+    @Override
+    public void close() throws IOException
+    {
+        if (this.textReader != null)
+        {
+            this.textReader.close();
+        }
     }
 
     @Override
     public int hashCode()
     {
-        return Objects.hash(
-                this.status, 
-                this.statusMessage, 
-                this.fetchTime,
-                this.contentLength, 
-                this.conversionTime, 
-                this.requestPage,
-                this.landingPage, 
-                this.contentType, 
-                this.contentCharset,
-                this.etag, 
-                this.lastModified, 
-                this.responseHeaders,
-                this.contentMetadata, 
-                this.convertedText);
+        try
+        {
+            getTextFromReader();
+        }
+        catch (Url2TextException e)
+        {
+            throw new IOError(e);
+        }
+        return Objects.hash(this.status, this.statusMessage, this.fetchTime,
+                this.contentLength, this.conversionTime, this.requestPage,
+                this.landingPage, this.contentType, this.contentCharset,
+                this.etag, this.lastModified, this.responseHeaders,
+                this.contentMetadata, this.text);
     }
 
     @Override
@@ -177,12 +196,13 @@ public class Url2TextResponse implements Serializable
         {
             result = false;
         }
-        else {
+        else
+        {
             final Url2TextResponse test = (Url2TextResponse) obj;
             // all content is included in toString(), so this is safe.
             result = test.toString().equals(this.toString());
         }
-        
+
         return result;
     }
 
@@ -210,16 +230,19 @@ public class Url2TextResponse implements Serializable
             jsonGenerator.writeStringField(HDR_REQUEST_PAGE, this.requestPage);
             jsonGenerator.writeStringField(HDR_LANDING_PAGE, this.landingPage);
             jsonGenerator.writeNumberField(HDR_STATUS, this.status);
-            jsonGenerator.writeStringField(HDR_STATUS_MESSAGE, this.statusMessage);
+            jsonGenerator.writeStringField(HDR_STATUS_MESSAGE,
+                    this.statusMessage);
             jsonGenerator.writeNumberField(HDR_FETCH_TIME, this.fetchTime);
             jsonGenerator.writeStringField(HDR_CONTENT_TYPE, this.contentType);
-            jsonGenerator
-                    .writeStringField(HDR_CONTENT_CHARSET, this.contentCharset);
-            jsonGenerator.writeNumberField(HDR_CONTENT_LENGTH, this.contentLength);
+            jsonGenerator.writeStringField(HDR_CONTENT_CHARSET,
+                    this.contentCharset);
+            jsonGenerator.writeNumberField(HDR_CONTENT_LENGTH,
+                    this.contentLength);
             jsonGenerator.writeStringField(HDR_ETAG, this.etag);
-            jsonGenerator.writeStringField(HDR_LAST_MODIFIED, this.lastModified);
             jsonGenerator
-                    .writeNumberField(HDR_CONVERSION_TIME, this.conversionTime);
+                    .writeStringField(HDR_LAST_MODIFIED, this.lastModified);
+            jsonGenerator.writeNumberField(HDR_CONVERSION_TIME,
+                    this.conversionTime);
 
             jsonGenerator.writeEndObject();
 
@@ -238,7 +261,8 @@ public class Url2TextResponse implements Serializable
             }
 
             // text
-            jsonGenerator.writeStringField(HDR_CONVERTED_TEXT, this.convertedText);
+            getTextFromReader();
+            jsonGenerator.writeStringField(HDR_CONVERTED_TEXT, this.text);
         }
         catch (IOException e)
         {
@@ -325,7 +349,15 @@ public class Url2TextResponse implements Serializable
             buffer.append('\n');
         }
         buffer.append("################ CONVERTED TEXT ######################\n");
-        buffer.append(convertedText);
+        try
+        {
+            getTextFromReader();
+            buffer.append(this.text);
+        }
+        catch (Url2TextException e)
+        {
+            throw new IOError(e);
+        }
         buffer.append('\n');
 
         return buffer.toString();
@@ -489,14 +521,71 @@ public class Url2TextResponse implements Serializable
                 : conversionMetadata;
     }
 
-    public String getConvertedText()
+    /**
+     * Consumes the Reader, which is then closed.
+     * 
+     * @return
+     * @throws Url2TextException
+     */
+    public String getText() throws Url2TextException
     {
-        return this.convertedText;
+        if (this.text == null)
+        {
+            this.getTextFromReader();
+        }
+        return this.text;
     }
 
-    public void setConvertedText(final String convertedText)
+    public void setText(final String text)
     {
-        this.convertedText = (convertedText == null) ? "" : convertedText;
+        Objects.requireNonNull(text, "No text provided.");
+        this.textReader = null;
+        this.text = text;
+    }
+
+    public Reader getTextReader()
+    {
+        if (this.text == null)
+        {
+            return this.textReader;
+        }
+        else
+        {
+            return new StringReader(this.text);
+        }
+    }
+
+    public void setTextReader(final Reader reader)
+    {
+        Objects.requireNonNull(reader, "No Reader supplied.");
+        this.textReader = reader;
+        this.text = null;
+    }
+
+    private void getTextFromReader() throws Url2TextException
+    {
+        if (this.textReader == null)
+        {
+            return;
+        }
+        final char[] arr = new char[8 * 1024]; // 8K at a time
+        final StringBuilder buf = new StringBuilder();
+        int numChars;
+
+        try
+        {
+            while ((numChars = textReader.read(arr, 0, arr.length)) > 0)
+            {
+                buf.append(arr, 0, numChars);
+            }
+            this.text = buf.toString();
+            this.textReader.close();
+            this.textReader = null;
+        }
+        catch (IOException e)
+        {
+            throw new Url2TextException(e);
+        }
     }
 
 }

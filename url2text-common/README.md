@@ -31,6 +31,8 @@ Url2Text classes only throw instances of this exception.
 ### Class: Url2TextResponse
 Encapsulates the response data, plus `toJson()` and `toString()` methods for JSON and plain text output respectively.
 
+To reduce memory usage, a Reader is used internally as the text provider.  Thus instances of this class are both Closeable and AutoCloseable.
+
 
 LICENSE
 -------

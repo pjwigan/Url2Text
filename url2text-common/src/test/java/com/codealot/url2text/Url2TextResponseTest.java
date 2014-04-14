@@ -3,6 +3,8 @@ package com.codealot.url2text;
 import static com.codealot.url2text.Constants.*;
 import static org.junit.Assert.*;
 
+import java.io.IOException;
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,7 +18,7 @@ public class Url2TextResponseTest
 {
 
     private final ObjectMapper mapper = new ObjectMapper();
-    private final Url2TextResponse response = new Url2TextResponse();
+    // private final Url2TextResponse response = new Url2TextResponse();
     private final List<NameAndValue> namesAndValues = new ArrayList<>();
 
     @Before
@@ -26,303 +28,420 @@ public class Url2TextResponseTest
     }
 
     @Test
-    public void testAsFormat() throws Url2TextException
+    public void testAsFormat() throws Url2TextException, IOException
     {
-        // just check the type returned
-        final String s = this.response.asFormat(OutputFormat.PLAIN);
-        assertTrue(s.startsWith("####"));
+        try (final Url2TextResponse response = new Url2TextResponse())
+        {
+            // just check the type returned
+            final String s = response.asFormat(OutputFormat.PLAIN);
+            assertTrue(s.startsWith("####"));
 
-        final String j = this.response.asFormat(OutputFormat.JSON);
-        assertTrue(j.startsWith("{\"Transaction"));
+            final String j = response.asFormat(OutputFormat.JSON);
+            assertTrue(j.startsWith("{\"Transaction"));
+        }
     }
 
     @Test
     public void testToJson() throws Exception
     {
-        // check all fields are included
-        this.response.setContentMetadata(namesAndValues);
-        this.response.setResponseHeaders(namesAndValues);
+        try (final Url2TextResponse response = new Url2TextResponse())
+        {
+            // check all fields are included
+            response.setContentMetadata(namesAndValues);
+            response.setResponseHeaders(namesAndValues);
 
-        final JsonNode root = mapper.readTree(this.response.toJson());
-        // top level objects
-        assertTrue(root.has(HDR_TRANSACTION_METADATA));
-        assertTrue(root.has(HDR_RESPONSE_HEADERS));
-        assertTrue(root.has(HDR_CONTENT_METADATA));
-        assertTrue(root.has(HDR_CONVERTED_TEXT));
+            final JsonNode root = mapper.readTree(response.toJson());
 
-        final JsonNode tm = root.get(HDR_TRANSACTION_METADATA);
-        assertTrue(tm.has(HDR_REQUEST_PAGE));
-        assertTrue(tm.has(HDR_LANDING_PAGE));
-        assertTrue(tm.has(HDR_STATUS));
-        assertTrue(tm.has(HDR_STATUS_MESSAGE));
-        assertTrue(tm.has(HDR_FETCH_TIME));
-        assertTrue(tm.has(HDR_CONTENT_TYPE));
-        assertTrue(tm.has(HDR_CONTENT_CHARSET));
-        assertTrue(tm.has(HDR_CONTENT_LENGTH));
-        assertTrue(tm.has(HDR_ETAG));
-        assertTrue(tm.has(HDR_LAST_MODIFIED));
-        assertTrue(tm.has(HDR_CONVERSION_TIME));
+            // top level objects
+            assertTrue(root.has(HDR_TRANSACTION_METADATA));
+            assertTrue(root.has(HDR_RESPONSE_HEADERS));
+            assertTrue(root.has(HDR_CONTENT_METADATA));
+            assertTrue(root.has(HDR_CONVERTED_TEXT));
 
-        final JsonNode rh = root.get(HDR_RESPONSE_HEADERS);
-        assertTrue(rh.has("key1"));
+            final JsonNode tm = root.get(HDR_TRANSACTION_METADATA);
+            assertTrue(tm.has(HDR_REQUEST_PAGE));
+            assertTrue(tm.has(HDR_LANDING_PAGE));
+            assertTrue(tm.has(HDR_STATUS));
+            assertTrue(tm.has(HDR_STATUS_MESSAGE));
+            assertTrue(tm.has(HDR_FETCH_TIME));
+            assertTrue(tm.has(HDR_CONTENT_TYPE));
+            assertTrue(tm.has(HDR_CONTENT_CHARSET));
+            assertTrue(tm.has(HDR_CONTENT_LENGTH));
+            assertTrue(tm.has(HDR_ETAG));
+            assertTrue(tm.has(HDR_LAST_MODIFIED));
+            assertTrue(tm.has(HDR_CONVERSION_TIME));
 
-        final JsonNode cm = root.get(HDR_CONTENT_METADATA);
-        assertTrue(cm.has("key1"));
+            final JsonNode rh = root.get(HDR_RESPONSE_HEADERS);
+            assertTrue(rh.has("key1"));
+
+            final JsonNode cm = root.get(HDR_CONTENT_METADATA);
+            assertTrue(cm.has("key1"));
+        }
     }
 
     @Test
     public void testFromJson() throws Exception
     {
-        this.response.setContentCharset("charset");
-        this.response.setContentLength(1000);
-        this.response.setContentType("type");
-        this.response.setConversionTime(100);
-        this.response.setConvertedText("text");
-        this.response.setEtag("etag");
-        this.response.setFetchTime(100);
-        this.response.setLandingPage("landing page");
-        this.response.setLastModified("last modified");
-        this.response.setRequestPage("request page");
-        this.response.setStatus(200);
-        this.response.setStatusMessage("message");
-        this.response.setResponseHeaders(namesAndValues);
-        this.response.setContentMetadata(namesAndValues);
+        try (final Url2TextResponse response = new Url2TextResponse())
+        {
+            response.setContentCharset("charset");
+            response.setContentLength(1000);
+            response.setContentType("type");
+            response.setConversionTime(100);
+            response.setText("text");
+            response.setEtag("etag");
+            response.setFetchTime(100);
+            response.setLandingPage("landing page");
+            response.setLastModified("last modified");
+            response.setRequestPage("request page");
+            response.setStatus(200);
+            response.setStatusMessage("message");
+            response.setResponseHeaders(namesAndValues);
+            response.setContentMetadata(namesAndValues);
 
-        final Url2TextResponse r2 = new Url2TextResponse(this.response.toJson());
-        assertEquals(this.response, r2);
+            try (final Url2TextResponse r2 = new Url2TextResponse(
+                    response.toJson()))
+            {
+                assertEquals(response, r2);
+            }
+        }
     }
 
     @Test
-    public void testEquals()
+    public void testEquals() throws IOException
     {
-        final Url2TextResponse r2 = new Url2TextResponse();
-        assertEquals(this.response, r2);
-        this.response.setContentLength(100);
-        assertNotEquals(this.response, r2);
+        try (final Url2TextResponse response = new Url2TextResponse();
+                final Url2TextResponse r2 = new Url2TextResponse())
+        {
+            assertEquals(response, r2);
+            response.setContentLength(100);
+            assertNotEquals(response, r2);
+        }
     }
 
     @Test
-    public void testHashCode()
+    public void testHashCode() throws IOException
     {
-        final Url2TextResponse r2 = new Url2TextResponse();
-        assertEquals(this.response.hashCode(), r2.hashCode());
-        this.response.setContentLength(100);
-        assertNotEquals(this.response.hashCode(), r2.hashCode());
+        try (final Url2TextResponse response = new Url2TextResponse();
+                final Url2TextResponse r2 = new Url2TextResponse())
+        {
+            assertEquals(response.hashCode(), r2.hashCode());
+            response.setContentLength(100);
+            assertNotEquals(response.hashCode(), r2.hashCode());
+        }
     }
 
     @Test
     public void testToString() throws Exception
     {
-        // check all fields are included
-        this.response.setContentMetadata(namesAndValues);
-        this.response.setResponseHeaders(namesAndValues);
-        final String jsonString = this.response.toJson();
+        try (final Url2TextResponse response = new Url2TextResponse())
+        {
+            // check all fields are included
+            response.setContentMetadata(namesAndValues);
+            response.setResponseHeaders(namesAndValues);
+            final String jsonString = response.toJson();
 
-        assertTrue(jsonString.contains(HDR_TRANSACTION_METADATA));
-        assertTrue(jsonString.contains(HDR_RESPONSE_HEADERS));
-        assertTrue(jsonString.contains(HDR_CONTENT_METADATA));
-        assertTrue(jsonString.contains(HDR_CONVERTED_TEXT));
-        assertTrue(jsonString.contains(HDR_REQUEST_PAGE));
-        assertTrue(jsonString.contains(HDR_LANDING_PAGE));
-        assertTrue(jsonString.contains(HDR_STATUS));
-        assertTrue(jsonString.contains(HDR_STATUS_MESSAGE));
-        assertTrue(jsonString.contains(HDR_FETCH_TIME));
-        assertTrue(jsonString.contains(HDR_CONTENT_TYPE));
-        assertTrue(jsonString.contains(HDR_CONTENT_CHARSET));
-        assertTrue(jsonString.contains(HDR_CONTENT_LENGTH));
-        assertTrue(jsonString.contains(HDR_ETAG));
-        assertTrue(jsonString.contains(HDR_CONVERSION_TIME));
-        assertTrue(jsonString.contains("key1"));
+            assertTrue(jsonString.contains(HDR_TRANSACTION_METADATA));
+            assertTrue(jsonString.contains(HDR_RESPONSE_HEADERS));
+            assertTrue(jsonString.contains(HDR_CONTENT_METADATA));
+            assertTrue(jsonString.contains(HDR_CONVERTED_TEXT));
+            assertTrue(jsonString.contains(HDR_REQUEST_PAGE));
+            assertTrue(jsonString.contains(HDR_LANDING_PAGE));
+            assertTrue(jsonString.contains(HDR_STATUS));
+            assertTrue(jsonString.contains(HDR_STATUS_MESSAGE));
+            assertTrue(jsonString.contains(HDR_FETCH_TIME));
+            assertTrue(jsonString.contains(HDR_CONTENT_TYPE));
+            assertTrue(jsonString.contains(HDR_CONTENT_CHARSET));
+            assertTrue(jsonString.contains(HDR_CONTENT_LENGTH));
+            assertTrue(jsonString.contains(HDR_ETAG));
+            assertTrue(jsonString.contains(HDR_CONVERSION_TIME));
+            assertTrue(jsonString.contains("key1"));
+        }
     }
 
     @Test
-    public void testSetRequestPage()
+    public void testSetRequestPage() throws IOException
     {
-        // check initially STR_NOT_SET, then "", then "value".
-        assertEquals(STR_NOT_SET, this.response.getRequestPage());
-        this.response.setRequestPage(null);
-        assertEquals("", this.response.getRequestPage());
-        this.response.setRequestPage("");
-        assertEquals("", this.response.getRequestPage());
-        this.response.setRequestPage("value");
-        assertEquals("value", this.response.getRequestPage());
+        try (final Url2TextResponse response = new Url2TextResponse())
+        {
+            // check initially STR_NOT_SET, then "", then "value".
+            assertEquals(STR_NOT_SET, response.getRequestPage());
+            response.setRequestPage(null);
+            assertEquals("", response.getRequestPage());
+            response.setRequestPage("");
+            assertEquals("", response.getRequestPage());
+            response.setRequestPage("value");
+            assertEquals("value", response.getRequestPage());
+        }
     }
 
     @Test
-    public void testSetLandingPage()
+    public void testSetLandingPage() throws IOException
     {
-        // check initially STR_NOT_SET, then "", then "value".
-        assertEquals(STR_NOT_SET, this.response.getLandingPage());
-        this.response.setLandingPage(null);
-        assertEquals("", this.response.getLandingPage());
-        this.response.setLandingPage("");
-        assertEquals("", this.response.getLandingPage());
-        this.response.setLandingPage("value");
-        assertEquals("value", this.response.getLandingPage());
+        try (final Url2TextResponse response = new Url2TextResponse())
+        {
+            // check initially STR_NOT_SET, then "", then "value".
+            assertEquals(STR_NOT_SET, response.getLandingPage());
+            response.setLandingPage(null);
+            assertEquals("", response.getLandingPage());
+            response.setLandingPage("");
+            assertEquals("", response.getLandingPage());
+            response.setLandingPage("value");
+            assertEquals("value", response.getLandingPage());
+        }
     }
 
     @Test
-    public void testSetStatus()
+    public void testSetStatus() throws IOException
     {
-        // check initially INT_NOT_SET, then 0, then number
-        assertEquals(INT_NOT_SET, this.response.getStatus());
-        this.response.setStatus(0);
-        assertEquals(0, this.response.getStatus());
-        this.response.setStatus(1000);
-        assertEquals(1000, this.response.getStatus());
+        try (final Url2TextResponse response = new Url2TextResponse())
+        {
+            // check initially INT_NOT_SET, then 0, then number
+            assertEquals(INT_NOT_SET, response.getStatus());
+            response.setStatus(0);
+            assertEquals(0, response.getStatus());
+            response.setStatus(1000);
+            assertEquals(1000, response.getStatus());
+        }
     }
 
     @Test
-    public void testSetStatusMessage()
+    public void testSetStatusMessage() throws IOException
     {
-        // check initially STR_NOT_SET, then "", then "value".
-        assertEquals(STR_NOT_SET, this.response.getStatusMessage());
-        this.response.setStatusMessage(null);
-        assertEquals("", this.response.getStatusMessage());
-        this.response.setStatusMessage("");
-        assertEquals("", this.response.getStatusMessage());
-        this.response.setStatusMessage("value");
-        assertEquals("value", this.response.getStatusMessage());
+        try (final Url2TextResponse response = new Url2TextResponse())
+        {
+            // check initially STR_NOT_SET, then "", then "value".
+            assertEquals(STR_NOT_SET, response.getStatusMessage());
+            response.setStatusMessage(null);
+            assertEquals("", response.getStatusMessage());
+            response.setStatusMessage("");
+            assertEquals("", response.getStatusMessage());
+            response.setStatusMessage("value");
+            assertEquals("value", response.getStatusMessage());
+        }
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void testSetFetchTimeNegative()
+    public void testSetFetchTimeNegative() throws IOException
     {
-        this.response.setFetchTime(-1);
+        try (final Url2TextResponse response = new Url2TextResponse())
+        {
+            response.setFetchTime(-1);
+        }
     }
 
     @Test
-    public void testSetFetchTime()
+    public void testSetFetchTime() throws IOException
     {
-        // check initially LONG_NOT_SET, then 0, then number
-        assertEquals(LONG_NOT_SET, this.response.getFetchTime());
-        this.response.setFetchTime(0);
-        assertEquals(0, this.response.getFetchTime());
-        this.response.setFetchTime(1000);
-        assertEquals(1000, this.response.getFetchTime());
+        try (final Url2TextResponse response = new Url2TextResponse())
+        {
+            // check initially LONG_NOT_SET, then 0, then number
+            assertEquals(LONG_NOT_SET, response.getFetchTime());
+            response.setFetchTime(0);
+            assertEquals(0, response.getFetchTime());
+            response.setFetchTime(1000);
+            assertEquals(1000, response.getFetchTime());
+        }
     }
 
     @Test
-    public void testSetContentType()
+    public void testSetContentType() throws IOException
     {
-        // check initially STR_NOT_SET, then "", then "value".
-        assertEquals(STR_NOT_SET, this.response.getContentType());
-        this.response.setContentType(null);
-        assertEquals("", this.response.getContentType());
-        this.response.setContentType("");
-        assertEquals("", this.response.getContentType());
-        this.response.setContentType("value");
-        assertEquals("value", this.response.getContentType());
+        try (final Url2TextResponse response = new Url2TextResponse())
+        {
+            // check initially STR_NOT_SET, then "", then "value".
+            assertEquals(STR_NOT_SET, response.getContentType());
+            response.setContentType(null);
+            assertEquals("", response.getContentType());
+            response.setContentType("");
+            assertEquals("", response.getContentType());
+            response.setContentType("value");
+            assertEquals("value", response.getContentType());
+        }
     }
 
     @Test
-    public void testSetContentCharset()
+    public void testSetContentCharset() throws IOException
     {
-        // check initially STR_NOT_SET, then "", then "value".
-        assertEquals(STR_NOT_SET, this.response.getContentCharset());
-        this.response.setContentCharset(null);
-        assertEquals("", this.response.getContentCharset());
-        this.response.setContentCharset("");
-        assertEquals("", this.response.getContentCharset());
-        this.response.setContentCharset("value");
-        assertEquals("value", this.response.getContentCharset());
+        try (final Url2TextResponse response = new Url2TextResponse())
+        {
+            // check initially STR_NOT_SET, then "", then "value".
+            assertEquals(STR_NOT_SET, response.getContentCharset());
+            response.setContentCharset(null);
+            assertEquals("", response.getContentCharset());
+            response.setContentCharset("");
+            assertEquals("", response.getContentCharset());
+            response.setContentCharset("value");
+            assertEquals("value", response.getContentCharset());
+        }
     }
 
     @Test
-    public void testSetConversionTime()
+    public void testSetConversionTime() throws IOException
     {
-        // check initially 0L, then number
-        assertEquals(0L, this.response.getConversionTime());
-        this.response.setConversionTime(1000);
-        assertEquals(1000, this.response.getConversionTime());
+        try (final Url2TextResponse response = new Url2TextResponse())
+        {
+            // check initially 0L, then number
+            assertEquals(0L, response.getConversionTime());
+            response.setConversionTime(1000);
+            assertEquals(1000, response.getConversionTime());
+        }
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void testSetConversionTimeNegative()
+    public void testSetConversionTimeNegative() throws IOException
     {
-        this.response.setConversionTime(-1);
+        try (final Url2TextResponse response = new Url2TextResponse())
+        {
+            response.setConversionTime(-1);
+        }
     }
 
     @Test
-    public void testSetEtag()
+    public void testSetEtag() throws IOException
     {
-        // check initially STR_NOT_SET, then "", then "value".
-        assertEquals(STR_NOT_SET, this.response.getEtag());
-        this.response.setEtag(null);
-        assertEquals("", this.response.getEtag());
-        this.response.setEtag("");
-        assertEquals("", this.response.getEtag());
-        this.response.setEtag("value");
-        assertEquals("value", this.response.getEtag());
+        try (final Url2TextResponse response = new Url2TextResponse())
+        {
+            // check initially STR_NOT_SET, then "", then "value".
+            assertEquals(STR_NOT_SET, response.getEtag());
+            response.setEtag(null);
+            assertEquals("", response.getEtag());
+            response.setEtag("");
+            assertEquals("", response.getEtag());
+            response.setEtag("value");
+            assertEquals("value", response.getEtag());
+        }
     }
 
     @Test
-    public void testSetLastModified()
+    public void testSetLastModified() throws IOException
     {
-        // check initially STR_NOT_SET, then "", then "value".
-        assertEquals(STR_NOT_SET, this.response.getLastModified());
-        this.response.setLastModified(null);
-        assertEquals("", this.response.getLastModified());
-        this.response.setLastModified("");
-        assertEquals("", this.response.getLastModified());
-        this.response.setLastModified("value");
-        assertEquals("value", this.response.getLastModified());
+        try (final Url2TextResponse response = new Url2TextResponse())
+        {
+            // check initially STR_NOT_SET, then "", then "value".
+            assertEquals(STR_NOT_SET, response.getLastModified());
+            response.setLastModified(null);
+            assertEquals("", response.getLastModified());
+            response.setLastModified("");
+            assertEquals("", response.getLastModified());
+            response.setLastModified("value");
+            assertEquals("value", response.getLastModified());
+        }
     }
 
     @Test
-    public void testSetContentLengthLong()
+    public void testSetContentLengthLong() throws IOException
     {
-        // check initially LONG_NOT_SET, then 0, then number
-        assertEquals(LONG_NOT_SET, this.response.getContentLength());
-        this.response.setContentLength(0);
-        assertEquals(0, this.response.getContentLength());
-        this.response.setContentLength(1000);
-        assertEquals(1000, this.response.getContentLength());
+        try (final Url2TextResponse response = new Url2TextResponse())
+        {
+            // check initially LONG_NOT_SET, then 0, then number
+            assertEquals(LONG_NOT_SET, response.getContentLength());
+            response.setContentLength(0);
+            assertEquals(0, response.getContentLength());
+            response.setContentLength(1000);
+            assertEquals(1000, response.getContentLength());
+        }
 
     }
 
     @Test
-    public void testSetContentLengthString()
+    public void testSetContentLengthString() throws IOException
     {
-        // check null == "" == 0L, then number
-        assertEquals(LONG_NOT_SET, this.response.getContentLength());
-        this.response.setContentLength(null);
-        assertEquals(0L, this.response.getContentLength());
-        this.response.setContentLength("");
-        assertEquals(0L, this.response.getContentLength());
-        this.response.setContentLength("10000");
-        assertEquals(10000L, this.response.getContentLength());
+        try (final Url2TextResponse response = new Url2TextResponse())
+        {
+            // check null == "" == 0L, then number
+            assertEquals(LONG_NOT_SET, response.getContentLength());
+            response.setContentLength(null);
+            assertEquals(0L, response.getContentLength());
+            response.setContentLength("");
+            assertEquals(0L, response.getContentLength());
+            response.setContentLength("10000");
+            assertEquals(10000L, response.getContentLength());
+        }
     }
 
     @Test
-    public void testSetResponseHeaders()
+    public void testSetResponseHeaders() throws IOException
     {
-        // check null == empty list
-        assertEquals(0, this.response.getResponseHeaders().size());
-        this.response.setResponseHeaders(null);
-        assertEquals(0, this.response.getResponseHeaders().size());
-        this.response.setResponseHeaders(namesAndValues);
-        assertTrue(namesAndValues == this.response.getResponseHeaders());
+        try (final Url2TextResponse response = new Url2TextResponse())
+        {
+            // check null == empty list
+            assertEquals(0, response.getResponseHeaders().size());
+            response.setResponseHeaders(null);
+            assertEquals(0, response.getResponseHeaders().size());
+            response.setResponseHeaders(namesAndValues);
+            assertTrue(namesAndValues == response.getResponseHeaders());
+        }
     }
 
     @Test
-    public void testSetContentMetadata()
+    public void testSetContentMetadata() throws IOException
     {
-        // check null == empty list
-        assertEquals(0, this.response.getContentMetadata().size());
-        this.response.setContentMetadata(null);
-        assertEquals(0, this.response.getContentMetadata().size());
-        this.response.setContentMetadata(namesAndValues);
-        assertTrue(namesAndValues == this.response.getContentMetadata());
+        try (final Url2TextResponse response = new Url2TextResponse())
+        {
+            // check null == empty list
+            assertEquals(0, response.getContentMetadata().size());
+            response.setContentMetadata(null);
+            assertEquals(0, response.getContentMetadata().size());
+            response.setContentMetadata(namesAndValues);
+            assertTrue(namesAndValues == response.getContentMetadata());
+        }
     }
 
     @Test
-    public void testSetConvertedText()
+    public void testSetText() throws IOException, Url2TextException
     {
-        // check STR_NOT_SET then value
-        assertEquals(STR_NOT_SET, this.response.getConvertedText());
-        this.response.setConvertedText("value");
-        assertEquals("value", this.response.getConvertedText());
+        try (final Url2TextResponse response = new Url2TextResponse())
+        {
+            // check STR_NOT_SET then value
+            assertEquals(STR_NOT_SET, response.getText());
+            response.setText("value");
+            assertEquals("value", response.getText());
+        }
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void testSetTextNull() throws IOException, Url2TextException
+    {
+        try (final Url2TextResponse response = new Url2TextResponse())
+        {
+            response.setText(null);
+        }
+    }
+    
+    @Test(expected = NullPointerException.class)
+    public void testSetTextReaderNull() throws IOException, Url2TextException
+    {
+        try (final Url2TextResponse response = new Url2TextResponse())
+        {
+            response.setTextReader(null);
+        }
+    }
+    
+    @Test
+    public void testSetTextReader() throws IOException, Url2TextException
+    {
+        try (final Url2TextResponse response = new Url2TextResponse())
+        {
+            // check STR_NOT_SET then value
+            assertEquals(STR_NOT_SET, response.getText());
+            response.setTextReader(new StringReader("value"));
+            assertEquals("value", response.getText());
+        }
+    }
+    
+    @Test
+    public void testGetText() throws IOException, Url2TextException 
+    {
+        try (final Url2TextResponse response = new Url2TextResponse())
+        {
+            // check STR_NOT_SET then value
+            assertEquals(STR_NOT_SET, response.getText());
+            response.setTextReader(new StringReader("value"));
+            assertEquals("value", response.getText());
+            // now check the read text has been retained.
+            assertEquals("value", response.getText());
+        }        
     }
 
 }
