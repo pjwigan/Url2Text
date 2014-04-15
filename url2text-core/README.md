@@ -37,6 +37,8 @@ Basic use is:
     {              
         if (response.getStatus() == 200) {
             return response.toJson();
+        } else {
+        ...
         }
     } catch (Url2TextException e) {
         ...

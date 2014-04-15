@@ -8,7 +8,6 @@ import java.io.IOError;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -71,6 +70,9 @@ public class Url2TextResponse implements Closeable, AutoCloseable
     // resulting text
     private Reader textReader = new StringReader(STR_NOT_SET);
     private String text = null;
+    
+    // operational flag
+    private boolean textSupplied = false;
 
     // constructor
     public Url2TextResponse()
@@ -88,7 +90,6 @@ public class Url2TextResponse implements Closeable, AutoCloseable
     public Url2TextResponse(final String json) throws JsonProcessingException,
             IOException
     {
-
         final ObjectMapper mapper = new ObjectMapper();
         final JsonNode rootNode = mapper.readTree(json);
 
@@ -202,7 +203,6 @@ public class Url2TextResponse implements Closeable, AutoCloseable
             // all content is included in toString(), so this is safe.
             result = test.toString().equals(this.toString());
         }
-
         return result;
     }
 
@@ -220,7 +220,6 @@ public class Url2TextResponse implements Closeable, AutoCloseable
         try (final JsonGenerator jsonGenerator = jFactory
                 .createGenerator(destination);)
         {
-
             jsonGenerator.writeStartObject();
 
             // transaction metadata
@@ -263,19 +262,15 @@ public class Url2TextResponse implements Closeable, AutoCloseable
             // text
             getTextFromReader();
             jsonGenerator.writeStringField(HDR_CONVERTED_TEXT, this.text);
+            jsonGenerator.writeEndObject();
+            jsonGenerator.close();
+
+            String result = destination.toString(UTF_8);
+            return result;
         }
         catch (IOException e)
         {
             throw new Url2TextException("Error emitting JSON", e);
-        }
-
-        try
-        {
-            return destination.toString(UTF_8);
-        }
-        catch (UnsupportedEncodingException e)
-        {
-            throw new Url2TextException(e);
         }
     }
 
@@ -527,7 +522,7 @@ public class Url2TextResponse implements Closeable, AutoCloseable
      * @return
      * @throws Url2TextException
      */
-    public String getText() throws Url2TextException
+    protected String getText() throws Url2TextException
     {
         if (this.text == null)
         {
@@ -536,11 +531,15 @@ public class Url2TextResponse implements Closeable, AutoCloseable
         return this.text;
     }
 
-    public void setText(final String text)
+    protected void setText(final String text)
     {
         Objects.requireNonNull(text, "No text provided.");
+        if (this.textSupplied) {
+            throw new IllegalStateException("Text or Reader already supplied.");
+        }
         this.textReader = null;
         this.text = text;
+        this.textSupplied = true;
     }
 
     public Reader getTextReader()
@@ -558,8 +557,12 @@ public class Url2TextResponse implements Closeable, AutoCloseable
     public void setTextReader(final Reader reader)
     {
         Objects.requireNonNull(reader, "No Reader supplied.");
+        if (this.textSupplied) {
+            throw new IllegalStateException("Text or Reader already supplied.");
+        }
         this.textReader = reader;
         this.text = null;
+        this.textSupplied = true;
     }
 
     private void getTextFromReader() throws Url2TextException
@@ -580,7 +583,7 @@ public class Url2TextResponse implements Closeable, AutoCloseable
             }
             this.text = buf.toString();
             this.textReader.close();
-            this.textReader = null;
+            this.textReader = null; 
         }
         catch (IOException e)
         {

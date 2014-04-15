@@ -1,14 +1,20 @@
 package com.codealot.textstore;
 
 import java.io.IOException;
+import java.io.Reader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
 import java.util.Formatter;
 import java.util.Objects;
+import java.util.UUID;
+
+import org.apache.commons.io.input.ReaderInputStream;
 
 /**
  * Simple storage system, using files on the default FileSystem.
@@ -19,6 +25,9 @@ import java.util.Objects;
  * <p>
  * Although it should be possible to have multiple instances of this class using
  * the same storage path, this is not recommended.
+ * <p>
+ * Note that no attempt is made to clean or check the provided text (other than
+ * it, or its Reader, not being null).
  * 
  * @author jacobsp
  * 
@@ -80,26 +89,14 @@ public class FileStore implements TextStoreAPI
     public String storeText(final String text) throws IOException
     {
         Objects.requireNonNull(text, "No text provided");
-        final String trimmedText = text.trim();
-        if (trimmedText.length() == 0)
-        {
-            throw new IllegalArgumentException(
-                    "Text consists only of whitespace or is empty.");
-        }
 
-        // make the digest
-        MessageDigest crypt = null;
-        try
-        {
-            crypt = MessageDigest.getInstance("SHA-1");
-        }
-        catch (NoSuchAlgorithmException e)
-        {
-            throw new IllegalStateException(e);
-        }
-        final byte[] textBytes = trimmedText.getBytes(StandardCharsets.UTF_8);
-        crypt.update(textBytes);
-        final String hash = byteToHex(crypt.digest());
+        // make the digester
+        final MessageDigest digester = getDigester();
+
+        // make the hex hash
+        final byte[] textBytes = text.getBytes(StandardCharsets.UTF_8);
+        digester.update(textBytes);
+        final String hash = byteToHex(digester.digest());
 
         // store the text
         final Path textPath = Paths.get(this.storeRoot, hash);
@@ -117,7 +114,6 @@ public class FileStore implements TextStoreAPI
                 throw e;
             }
         }
-        // return the hash as a hex string
         return hash;
     }
 
@@ -128,6 +124,18 @@ public class FileStore implements TextStoreAPI
 
         final Path textPath = Paths.get(this.storeRoot, hash);
         Files.delete(textPath);
+    }
+
+    private MessageDigest getDigester()
+    {
+        try
+        {
+            return MessageDigest.getInstance("SHA-1");
+        }
+        catch (NoSuchAlgorithmException e)
+        {
+            throw new IllegalStateException(e);
+        }
     }
 
     private void checkHash(final String hash)
@@ -149,6 +157,59 @@ public class FileStore implements TextStoreAPI
         final String result = formatter.toString();
         formatter.close();
         return result;
+    }
+
+    @Override
+    public String storeText(final Reader reader) throws IOException
+    {
+        Objects.requireNonNull(reader, "No reader provided");
+
+        // make the digester
+        final MessageDigest digester = getDigester();
+
+        // make temp file
+        final Path textPath = Paths.get(this.storeRoot, UUID.randomUUID()
+                .toString());
+
+        // stream to file, building digest
+        final ReaderInputStream readerAsBytes = new ReaderInputStream(reader,
+                StandardCharsets.UTF_8);
+        try
+        {
+            final byte[] bytes = new byte[1024];
+            int readLength = 0;
+
+            while ((readLength = readerAsBytes.read(bytes)) > 0)
+            {
+                digester.update(bytes, 0, readLength);
+                
+                final byte[] readBytes = Arrays.copyOf(bytes, readLength);
+                Files.write(textPath, readBytes, StandardOpenOption.CREATE,
+                        StandardOpenOption.WRITE, StandardOpenOption.APPEND);
+            }
+            // make the hash
+            final String hash = byteToHex(digester.digest());
+
+            // store the text, if new
+            final Path finalPath = Paths.get(this.storeRoot, hash);
+            if (!Files.exists(finalPath))
+            {
+                // rename the file
+                Files.move(textPath, finalPath);
+            }
+            else {
+                // already existed, so delete uuid named one
+                Files.deleteIfExists(textPath);
+            }
+            return hash;
+        }
+        finally
+        {
+            if (readerAsBytes != null)
+            {
+                readerAsBytes.close();
+            }
+        }
     }
 
 }

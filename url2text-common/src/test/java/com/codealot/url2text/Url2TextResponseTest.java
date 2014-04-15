@@ -49,8 +49,10 @@ public class Url2TextResponseTest
             // check all fields are included
             response.setContentMetadata(namesAndValues);
             response.setResponseHeaders(namesAndValues);
+            
+            String jsonString = response.toJson();
 
-            final JsonNode root = mapper.readTree(response.toJson());
+            final JsonNode root = mapper.readTree(jsonString);
 
             // top level objects
             assertTrue(root.has(HDR_TRANSACTION_METADATA));
@@ -139,23 +141,22 @@ public class Url2TextResponseTest
             // check all fields are included
             response.setContentMetadata(namesAndValues);
             response.setResponseHeaders(namesAndValues);
-            final String jsonString = response.toJson();
+            final String string = response.toString();
 
-            assertTrue(jsonString.contains(HDR_TRANSACTION_METADATA));
-            assertTrue(jsonString.contains(HDR_RESPONSE_HEADERS));
-            assertTrue(jsonString.contains(HDR_CONTENT_METADATA));
-            assertTrue(jsonString.contains(HDR_CONVERTED_TEXT));
-            assertTrue(jsonString.contains(HDR_REQUEST_PAGE));
-            assertTrue(jsonString.contains(HDR_LANDING_PAGE));
-            assertTrue(jsonString.contains(HDR_STATUS));
-            assertTrue(jsonString.contains(HDR_STATUS_MESSAGE));
-            assertTrue(jsonString.contains(HDR_FETCH_TIME));
-            assertTrue(jsonString.contains(HDR_CONTENT_TYPE));
-            assertTrue(jsonString.contains(HDR_CONTENT_CHARSET));
-            assertTrue(jsonString.contains(HDR_CONTENT_LENGTH));
-            assertTrue(jsonString.contains(HDR_ETAG));
-            assertTrue(jsonString.contains(HDR_CONVERSION_TIME));
-            assertTrue(jsonString.contains("key1"));
+            assertTrue(string.contains("################ TRANSACTION METADATA ################"));
+            assertTrue(string.contains("################ RESPONSE HEADERS ####################"));
+            assertTrue(string.contains("################ CONTENT METADATA ####################"));
+            assertTrue(string.contains("################ CONVERTED TEXT ######################"));
+            assertTrue(string.contains("Request page"));
+            assertTrue(string.contains("Landing page"));
+            assertTrue(string.contains("Status"));
+            assertTrue(string.contains("Fetch time"));
+            assertTrue(string.contains("Content type"));
+            assertTrue(string.contains("Content charset"));
+            assertTrue(string.contains("Content length"));
+            assertTrue(string.contains("Etag"));
+            assertTrue(string.contains("Convert time"));
+            assertTrue(string.contains("key1"));
         }
     }
 
@@ -400,6 +401,26 @@ public class Url2TextResponseTest
         }
     }
 
+    @Test(expected = IllegalStateException.class)
+    public void testSetTextRepeatText() throws IOException, Url2TextException
+    {
+        try (final Url2TextResponse response = new Url2TextResponse())
+        {
+            response.setText("value");
+            response.setText("repeat");
+        }
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void testSetTextRepeatReader() throws IOException, Url2TextException
+    {
+        try (final Url2TextResponse response = new Url2TextResponse())
+        {
+            response.setText("value");
+            response.setTextReader(new StringReader("repeat"));
+        }
+    }
+
     @Test(expected = NullPointerException.class)
     public void testSetTextNull() throws IOException, Url2TextException
     {
@@ -427,6 +448,26 @@ public class Url2TextResponseTest
             assertEquals(STR_NOT_SET, response.getText());
             response.setTextReader(new StringReader("value"));
             assertEquals("value", response.getText());
+        }
+    }
+    
+    @Test(expected = IllegalStateException.class)
+    public void testSetTextReaderRepeatText() throws IOException, Url2TextException
+    {
+        try (final Url2TextResponse response = new Url2TextResponse())
+        {
+            response.setTextReader(new StringReader("value"));
+            response.setText("repeat");
+        }
+    }
+    
+    @Test(expected = IllegalStateException.class)
+    public void testSetTextReaderRepeatReader() throws IOException, Url2TextException
+    {
+        try (final Url2TextResponse response = new Url2TextResponse())
+        {
+            response.setTextReader(new StringReader("value"));
+            response.setTextReader(new StringReader("repeat"));
         }
     }
     

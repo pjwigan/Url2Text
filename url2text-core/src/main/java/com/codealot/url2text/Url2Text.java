@@ -54,14 +54,15 @@ import com.gargoylesoftware.htmlunit.xml.XmlPage;
     import com.codealot.url2text.Url2TextResponse;    
     ...
     Url2Text fetch = new Url2Text();
-    try {        
-        fetch.setJavascriptEnabled(true);
-        fetch.setIncludeHeaders(true);
-        fetch.setIncludeMetadata(true);
-        ...
-        Url2TextResponse response = fetch.contentAsText("http://example.com");
+    fetch.setJavascriptEnabled(true);
+    fetch.setIncludeHeaders(true);
+    ...
+    try (Url2TextResponse response = fetch.contentAsText("http://example.com")) 
+    {              
         if (response.getStatus() == 200) {
             return response.toJson();
+        } else {
+        ...
         }
     } catch (Url2TextException e) {
         ...
@@ -103,7 +104,6 @@ import com.gargoylesoftware.htmlunit.xml.XmlPage;
  */
 public class Url2Text
 {
-
     // FUTURE suppress 'enable javascript' and 'enable cookies' messages when
     // those options have been specified (but might be an HtmlUnit bug)
 
@@ -1006,6 +1006,9 @@ public class Url2Text
 
     /**
      * Call Tika to convert to text and/or extract content metadata.
+     * <p>
+     * The Reader returned by Tika is fed into the response.  Note that this
+     * reader is responsible for closing the input stream.
      * 
      * @param response
      * @param page

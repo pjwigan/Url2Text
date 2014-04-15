@@ -4,6 +4,7 @@ import static org.junit.Assert.*;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.StringReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -37,6 +38,61 @@ public class FileStoreTest
             }
             Files.deleteIfExists(storeRoot);
         }
+    }
+    
+    private int countFiles() 
+    {
+        File rootDir = this.storeRoot.toFile();
+        String[] dirList = rootDir.list();
+        return dirList.length;
+    }
+    
+    @Test
+    public void testStoreReader() throws IOException
+    {
+        String text = "This is a test";
+        String id = fileStore.storeText(new StringReader(text));
+        assertEquals(text, fileStore.getText(id));
+    }
+
+    @Test
+    public void testStoreReaderText() throws IOException
+    {
+        String text = "This is a test";
+        String id1 = fileStore.storeText(new StringReader(text));
+        String id2 = fileStore.storeText(text);
+        assertEquals(id1, id2);
+        assertEquals(1, countFiles());
+    }
+
+    @Test
+    public void testStoreTextReader() throws IOException
+    {
+        String text = "This is a test";
+        String id1 = fileStore.storeText(text);
+        String id2 = fileStore.storeText(new StringReader(text));
+        assertEquals(id1, id2);
+        assertEquals(1, countFiles());
+    }
+
+    @Test
+    public void testStoreTextRepeat() throws IOException
+    {
+        String text = "This is a test";
+        String id1 = fileStore.storeText(text);
+        String id2 = fileStore.storeText(text);
+        assertEquals(id1, id2);
+        assertEquals(1, countFiles());
+    }
+
+    @Test
+    public void testStoreReaderRepeat() throws IOException
+    {
+        String text = "This is a test";
+        String id1 = fileStore.storeText(new StringReader(text));
+        String id2 = fileStore.storeText(new StringReader(text));
+        assertEquals(id1, id2);
+        assertEquals(1, countFiles());
     }
 
     @Test(expected = NullPointerException.class)
@@ -131,24 +187,6 @@ public class FileStoreTest
         String text = "This is a test";
         String id = fileStore.storeText(text);
         assertEquals(text, fileStore.getText(id));
-    }
-
-    @Test(expected = NullPointerException.class)
-    public void testStoreTextNull() throws IOException
-    {
-        fileStore.storeText(null);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void testStoreTextEmpty() throws IOException
-    {
-        fileStore.storeText("");
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void testStoreTextWhitespace() throws IOException
-    {
-        fileStore.storeText("           \n\r\t");
     }
 
     @Test

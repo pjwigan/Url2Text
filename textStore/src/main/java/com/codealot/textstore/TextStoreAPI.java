@@ -1,6 +1,7 @@
 package com.codealot.textstore;
 
 import java.io.IOException;
+import java.io.Reader;
 
 /**
  * Interface to decouple the storage and retrieval of text from the medium.
@@ -42,6 +43,15 @@ public interface TextStoreAPI
      * @throws IOException
      */
     public String storeText(String text) throws IOException;
+    
+    /**
+     * Store the text and return an id by which it can be retrieved or deleted.
+     * 
+     * @param reader source of text
+     * @return id of the stored text
+     * @throws IOException
+     */
+    public String storeText(Reader reader) throws IOException;
     
     /**
      * Delete the text represented by id from the store.
