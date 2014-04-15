@@ -4,7 +4,6 @@ import static com.codealot.url2text.Constants.*;
 
 import java.io.ByteArrayOutputStream;
 import java.io.Closeable;
-import java.io.IOError;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
@@ -48,7 +47,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  *         implied. See the License for the specific language governing
  *         permissions and limitations under the License.
  */
-public class Url2TextResponse implements Closeable, AutoCloseable
+public class Response implements Closeable, AutoCloseable
 {
     // transaction metadata
     private String requestPage = STR_NOT_SET;
@@ -67,15 +66,15 @@ public class Url2TextResponse implements Closeable, AutoCloseable
     private List<NameAndValue> responseHeaders = new ArrayList<>();
     private List<NameAndValue> contentMetadata = new ArrayList<>();
 
-    // resulting text
+    // text vars
     private Reader textReader = new StringReader(STR_NOT_SET);
-    private String text = null;
+    private String text = null; // used to make toString() and toJson() repeatable.
     
     // operational flag
     private boolean textSupplied = false;
 
     // constructor
-    public Url2TextResponse()
+    public Response()
     {
         // default
     }
@@ -87,7 +86,7 @@ public class Url2TextResponse implements Closeable, AutoCloseable
      * @throws IOException
      * @throws JsonProcessingException
      */
-    public Url2TextResponse(final String json) throws JsonProcessingException,
+    public Response(final String json) throws JsonProcessingException,
             IOException
     {
         final ObjectMapper mapper = new ObjectMapper();
@@ -176,7 +175,7 @@ public class Url2TextResponse implements Closeable, AutoCloseable
         }
         catch (Url2TextException e)
         {
-            throw new IOError(e);
+            throw new RuntimeException(e);
         }
         return Objects.hash(this.status, this.statusMessage, this.fetchTime,
                 this.contentLength, this.conversionTime, this.requestPage,
@@ -199,7 +198,7 @@ public class Url2TextResponse implements Closeable, AutoCloseable
         }
         else
         {
-            final Url2TextResponse test = (Url2TextResponse) obj;
+            final Response test = (Response) obj;
             // all content is included in toString(), so this is safe.
             result = test.toString().equals(this.toString());
         }
@@ -208,6 +207,9 @@ public class Url2TextResponse implements Closeable, AutoCloseable
 
     /**
      * Renders this object as JSON.
+     * <p>
+     * Beware. This method consumes the internal Reader, creating a buffer of
+     * unlimited size.
      * 
      * @return
      * @throws Url2TextException
@@ -260,8 +262,7 @@ public class Url2TextResponse implements Closeable, AutoCloseable
             }
 
             // text
-            getTextFromReader();
-            jsonGenerator.writeStringField(HDR_CONVERTED_TEXT, this.text);
+            jsonGenerator.writeStringField(HDR_CONVERTED_TEXT, this.getText());
             jsonGenerator.writeEndObject();
             jsonGenerator.close();
 
@@ -300,6 +301,9 @@ public class Url2TextResponse implements Closeable, AutoCloseable
 
     /**
      * Full dump of the response content in plain text format.
+     * <p>
+     * Beware. This method consumes the internal Reader, creating a buffer of
+     * unlimited size.
      */
     @Override
     public String toString()
@@ -346,12 +350,11 @@ public class Url2TextResponse implements Closeable, AutoCloseable
         buffer.append("################ CONVERTED TEXT ######################\n");
         try
         {
-            getTextFromReader();
-            buffer.append(this.text);
+            buffer.append(this.getText());
         }
         catch (Url2TextException e)
         {
-            throw new IOError(e);
+            throw new RuntimeException(e);
         }
         buffer.append('\n');
 
@@ -517,29 +520,21 @@ public class Url2TextResponse implements Closeable, AutoCloseable
     }
 
     /**
-     * Consumes the Reader, which is then closed.
+     * Consumes the Reader, which is then closed. 
+     * <p>
+     * Beware. This method consumes the internal Reader, creating a buffer of
+     * unlimited size.
      * 
      * @return
      * @throws Url2TextException
      */
-    protected String getText() throws Url2TextException
+    public String getText() throws Url2TextException
     {
         if (this.text == null)
         {
             this.getTextFromReader();
         }
         return this.text;
-    }
-
-    protected void setText(final String text)
-    {
-        Objects.requireNonNull(text, "No text provided.");
-        if (this.textSupplied) {
-            throw new IllegalStateException("Text or Reader already supplied.");
-        }
-        this.textReader = null;
-        this.text = text;
-        this.textSupplied = true;
     }
 
     public Reader getTextReader()

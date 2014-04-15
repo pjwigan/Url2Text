@@ -24,7 +24,7 @@ import java.io.Reader;
  *         implied. See the License for the specific language governing
  *         permissions and limitations under the License.
  */
-public interface TextStoreAPI
+public interface TextStore
 {
     /**
      * Fetch the text represented by an id.

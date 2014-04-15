@@ -47,7 +47,7 @@ import org.apache.commons.io.input.ReaderInputStream;
  *         implied. See the License for the specific language governing
  *         permissions and limitations under the License.
  */
-public class FileStore implements TextStoreAPI
+public class FileStore implements TextStore
 {
     // path to the root of the file store. Must be a directory.
     private final String storeRoot;

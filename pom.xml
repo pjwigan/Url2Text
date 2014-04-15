@@ -22,10 +22,11 @@
             <distribution>repo</distribution>
         </license>
     </licenses>
-<!--    <scm>-->
-<!--        <url>http://svn.apache.org/viewcvs.cgi/maven</url>-->
-<!--        <connection>http://svn.apache.org/viewcvs.cgi/maven</connection>-->
-<!--    </scm>-->
+    <scm>
+	    <connection>scm:git:git@github.com:pjwigan/Url2Text.git</connection>
+	    <url>scm:git:git@github.com:pjwigan/Url2Text.git</url>
+	    <developerConnection>scm:git:git@github.com:pjwigan/Url2Text.git</developerConnection>
+    </scm>
     <developers>
         <developer>
             <id>jacobsp</id>
@@ -154,18 +155,5 @@
             </plugins>
 		</pluginManagement>
 	</build>
-
-<!--	<reporting>-->
-<!--		<plugins>-->
-<!--			<plugin>-->
-<!--				<groupId>org.apache.maven.plugins</groupId>-->
-<!--				<artifactId>maven-javadoc-plugin</artifactId>-->
-<!--				<version>2.9.1</version>-->
-<!--				<configuration>-->
-<!--					<show>public</show>-->
-<!--				</configuration>-->
-<!--			</plugin>-->
-<!--		</plugins>-->
-<!--	</reporting>-->
 	
 </project>

@@ -27,28 +27,28 @@ Basic use is:
 
     import com.codealot.url2text.Url2Text;
     import com.codealot.url2text.Url2TextException;
-    import com.codealot.url2text.Url2TextResponse;    
+    import com.codealot.url2text.Response;    
     ...
     Url2Text fetch = new Url2Text();
     fetch.setJavascriptEnabled(true);
     fetch.setIncludeHeaders(true);
     ...
-    try (Url2TextResponse response = fetch.contentAsText("http://example.com")) 
+    try (Response response = fetch.contentAsText("http://example.com")) 
     {              
-        if (response.getStatus() == 200) {
+        if (response.getStatus() == 200) 
+        {
             return response.toJson();
-        } else {
+        } 
+        else {
         ...
         }
-    } catch (Url2TextException e) {
-        ...
-    }
+    } catch (Url2TextException e) { ... }
 
-The `Url2TextResponse` object encapsulates the fetched text (as a Reader), metadata, headers, etc.  
+The `Response` object encapsulates the fetched text (as a Reader), metadata, headers, etc.  
 
 *Currently Url2Text emulates FireFox.  (This project was inspired by a need to act as a proxy for a human user).  This may be made configurable in a future version.*
 
-Most of the HtmlUnit `WebClientOptions` and `CookieManager` features are exposed as properties of the Url2Text class.  Headers can also be added to the `WebRequest`.
+Most of the HtmlUnit `WebClientOptions` and `CookieManager` features are exposed as properties of the Url2Text class.  Headers can also be added to the `contentAsText()` call.
 
 No transient state is stored in the `Url2Text` instances, so they can be reused safely.
 

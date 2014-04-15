@@ -15,7 +15,7 @@ import org.slf4j.LoggerFactory;
 
 import com.codealot.url2text.Url2Text;
 import com.codealot.url2text.Url2TextException;
-import com.codealot.url2text.Url2TextResponse;
+import com.codealot.url2text.Response;
 
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
@@ -214,7 +214,7 @@ public class Application
         // issue fetch command
         try
         {
-            final Url2TextResponse response = fetcher.contentAsText(url, null);
+            final Response response = fetcher.contentAsText(url, null);
 
             if (options.has(OUTPUT_FILE))
             {

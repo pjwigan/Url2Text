@@ -14,11 +14,11 @@ import org.junit.Test;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-public class Url2TextResponseTest
+public class ResponseTest
 {
 
     private final ObjectMapper mapper = new ObjectMapper();
-    // private final Url2TextResponse response = new Url2TextResponse();
+    // private final Response response = new Response();
     private final List<NameAndValue> namesAndValues = new ArrayList<>();
 
     @Before
@@ -30,7 +30,7 @@ public class Url2TextResponseTest
     @Test
     public void testAsFormat() throws Url2TextException, IOException
     {
-        try (final Url2TextResponse response = new Url2TextResponse())
+        try (final Response response = new Response())
         {
             // just check the type returned
             final String s = response.asFormat(OutputFormat.PLAIN);
@@ -44,7 +44,7 @@ public class Url2TextResponseTest
     @Test
     public void testToJson() throws Exception
     {
-        try (final Url2TextResponse response = new Url2TextResponse())
+        try (final Response response = new Response())
         {
             // check all fields are included
             response.setContentMetadata(namesAndValues);
@@ -84,13 +84,13 @@ public class Url2TextResponseTest
     @Test
     public void testFromJson() throws Exception
     {
-        try (final Url2TextResponse response = new Url2TextResponse())
+        try (final Response response = new Response())
         {
             response.setContentCharset("charset");
             response.setContentLength(1000);
             response.setContentType("type");
             response.setConversionTime(100);
-            response.setText("text");
+            response.setTextReader(new StringReader("text"));
             response.setEtag("etag");
             response.setFetchTime(100);
             response.setLandingPage("landing page");
@@ -101,7 +101,7 @@ public class Url2TextResponseTest
             response.setResponseHeaders(namesAndValues);
             response.setContentMetadata(namesAndValues);
 
-            try (final Url2TextResponse r2 = new Url2TextResponse(
+            try (final Response r2 = new Response(
                     response.toJson()))
             {
                 assertEquals(response, r2);
@@ -112,8 +112,8 @@ public class Url2TextResponseTest
     @Test
     public void testEquals() throws IOException
     {
-        try (final Url2TextResponse response = new Url2TextResponse();
-                final Url2TextResponse r2 = new Url2TextResponse())
+        try (final Response response = new Response();
+                final Response r2 = new Response())
         {
             assertEquals(response, r2);
             response.setContentLength(100);
@@ -124,8 +124,8 @@ public class Url2TextResponseTest
     @Test
     public void testHashCode() throws IOException
     {
-        try (final Url2TextResponse response = new Url2TextResponse();
-                final Url2TextResponse r2 = new Url2TextResponse())
+        try (final Response response = new Response();
+                final Response r2 = new Response())
         {
             assertEquals(response.hashCode(), r2.hashCode());
             response.setContentLength(100);
@@ -136,7 +136,7 @@ public class Url2TextResponseTest
     @Test
     public void testToString() throws Exception
     {
-        try (final Url2TextResponse response = new Url2TextResponse())
+        try (final Response response = new Response())
         {
             // check all fields are included
             response.setContentMetadata(namesAndValues);
@@ -163,7 +163,7 @@ public class Url2TextResponseTest
     @Test
     public void testSetRequestPage() throws IOException
     {
-        try (final Url2TextResponse response = new Url2TextResponse())
+        try (final Response response = new Response())
         {
             // check initially STR_NOT_SET, then "", then "value".
             assertEquals(STR_NOT_SET, response.getRequestPage());
@@ -179,7 +179,7 @@ public class Url2TextResponseTest
     @Test
     public void testSetLandingPage() throws IOException
     {
-        try (final Url2TextResponse response = new Url2TextResponse())
+        try (final Response response = new Response())
         {
             // check initially STR_NOT_SET, then "", then "value".
             assertEquals(STR_NOT_SET, response.getLandingPage());
@@ -195,7 +195,7 @@ public class Url2TextResponseTest
     @Test
     public void testSetStatus() throws IOException
     {
-        try (final Url2TextResponse response = new Url2TextResponse())
+        try (final Response response = new Response())
         {
             // check initially INT_NOT_SET, then 0, then number
             assertEquals(INT_NOT_SET, response.getStatus());
@@ -209,7 +209,7 @@ public class Url2TextResponseTest
     @Test
     public void testSetStatusMessage() throws IOException
     {
-        try (final Url2TextResponse response = new Url2TextResponse())
+        try (final Response response = new Response())
         {
             // check initially STR_NOT_SET, then "", then "value".
             assertEquals(STR_NOT_SET, response.getStatusMessage());
@@ -225,7 +225,7 @@ public class Url2TextResponseTest
     @Test(expected = IllegalArgumentException.class)
     public void testSetFetchTimeNegative() throws IOException
     {
-        try (final Url2TextResponse response = new Url2TextResponse())
+        try (final Response response = new Response())
         {
             response.setFetchTime(-1);
         }
@@ -234,7 +234,7 @@ public class Url2TextResponseTest
     @Test
     public void testSetFetchTime() throws IOException
     {
-        try (final Url2TextResponse response = new Url2TextResponse())
+        try (final Response response = new Response())
         {
             // check initially LONG_NOT_SET, then 0, then number
             assertEquals(LONG_NOT_SET, response.getFetchTime());
@@ -248,7 +248,7 @@ public class Url2TextResponseTest
     @Test
     public void testSetContentType() throws IOException
     {
-        try (final Url2TextResponse response = new Url2TextResponse())
+        try (final Response response = new Response())
         {
             // check initially STR_NOT_SET, then "", then "value".
             assertEquals(STR_NOT_SET, response.getContentType());
@@ -264,7 +264,7 @@ public class Url2TextResponseTest
     @Test
     public void testSetContentCharset() throws IOException
     {
-        try (final Url2TextResponse response = new Url2TextResponse())
+        try (final Response response = new Response())
         {
             // check initially STR_NOT_SET, then "", then "value".
             assertEquals(STR_NOT_SET, response.getContentCharset());
@@ -280,7 +280,7 @@ public class Url2TextResponseTest
     @Test
     public void testSetConversionTime() throws IOException
     {
-        try (final Url2TextResponse response = new Url2TextResponse())
+        try (final Response response = new Response())
         {
             // check initially 0L, then number
             assertEquals(0L, response.getConversionTime());
@@ -292,7 +292,7 @@ public class Url2TextResponseTest
     @Test(expected = IllegalArgumentException.class)
     public void testSetConversionTimeNegative() throws IOException
     {
-        try (final Url2TextResponse response = new Url2TextResponse())
+        try (final Response response = new Response())
         {
             response.setConversionTime(-1);
         }
@@ -301,7 +301,7 @@ public class Url2TextResponseTest
     @Test
     public void testSetEtag() throws IOException
     {
-        try (final Url2TextResponse response = new Url2TextResponse())
+        try (final Response response = new Response())
         {
             // check initially STR_NOT_SET, then "", then "value".
             assertEquals(STR_NOT_SET, response.getEtag());
@@ -317,7 +317,7 @@ public class Url2TextResponseTest
     @Test
     public void testSetLastModified() throws IOException
     {
-        try (final Url2TextResponse response = new Url2TextResponse())
+        try (final Response response = new Response())
         {
             // check initially STR_NOT_SET, then "", then "value".
             assertEquals(STR_NOT_SET, response.getLastModified());
@@ -333,7 +333,7 @@ public class Url2TextResponseTest
     @Test
     public void testSetContentLengthLong() throws IOException
     {
-        try (final Url2TextResponse response = new Url2TextResponse())
+        try (final Response response = new Response())
         {
             // check initially LONG_NOT_SET, then 0, then number
             assertEquals(LONG_NOT_SET, response.getContentLength());
@@ -348,7 +348,7 @@ public class Url2TextResponseTest
     @Test
     public void testSetContentLengthString() throws IOException
     {
-        try (final Url2TextResponse response = new Url2TextResponse())
+        try (final Response response = new Response())
         {
             // check null == "" == 0L, then number
             assertEquals(LONG_NOT_SET, response.getContentLength());
@@ -364,7 +364,7 @@ public class Url2TextResponseTest
     @Test
     public void testSetResponseHeaders() throws IOException
     {
-        try (final Url2TextResponse response = new Url2TextResponse())
+        try (final Response response = new Response())
         {
             // check null == empty list
             assertEquals(0, response.getResponseHeaders().size());
@@ -378,7 +378,7 @@ public class Url2TextResponseTest
     @Test
     public void testSetContentMetadata() throws IOException
     {
-        try (final Url2TextResponse response = new Url2TextResponse())
+        try (final Response response = new Response())
         {
             // check null == empty list
             assertEquals(0, response.getContentMetadata().size());
@@ -389,51 +389,20 @@ public class Url2TextResponseTest
         }
     }
 
-    @Test
-    public void testSetText() throws IOException, Url2TextException
-    {
-        try (final Url2TextResponse response = new Url2TextResponse())
-        {
-            // check STR_NOT_SET then value
-            assertEquals(STR_NOT_SET, response.getText());
-            response.setText("value");
-            assertEquals("value", response.getText());
-        }
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void testSetTextRepeatText() throws IOException, Url2TextException
-    {
-        try (final Url2TextResponse response = new Url2TextResponse())
-        {
-            response.setText("value");
-            response.setText("repeat");
-        }
-    }
-
     @Test(expected = IllegalStateException.class)
     public void testSetTextRepeatReader() throws IOException, Url2TextException
     {
-        try (final Url2TextResponse response = new Url2TextResponse())
+        try (final Response response = new Response())
         {
-            response.setText("value");
+            response.setTextReader(new StringReader("value"));
             response.setTextReader(new StringReader("repeat"));
         }
     }
 
     @Test(expected = NullPointerException.class)
-    public void testSetTextNull() throws IOException, Url2TextException
-    {
-        try (final Url2TextResponse response = new Url2TextResponse())
-        {
-            response.setText(null);
-        }
-    }
-    
-    @Test(expected = NullPointerException.class)
     public void testSetTextReaderNull() throws IOException, Url2TextException
     {
-        try (final Url2TextResponse response = new Url2TextResponse())
+        try (final Response response = new Response())
         {
             response.setTextReader(null);
         }
@@ -442,47 +411,21 @@ public class Url2TextResponseTest
     @Test
     public void testSetTextReader() throws IOException, Url2TextException
     {
-        try (final Url2TextResponse response = new Url2TextResponse())
+        try (final Response response = new Response())
         {
-            // check STR_NOT_SET then value
-            assertEquals(STR_NOT_SET, response.getText());
             response.setTextReader(new StringReader("value"));
             assertEquals("value", response.getText());
-        }
-    }
-    
-    @Test(expected = IllegalStateException.class)
-    public void testSetTextReaderRepeatText() throws IOException, Url2TextException
-    {
-        try (final Url2TextResponse response = new Url2TextResponse())
-        {
-            response.setTextReader(new StringReader("value"));
-            response.setText("repeat");
         }
     }
     
     @Test(expected = IllegalStateException.class)
     public void testSetTextReaderRepeatReader() throws IOException, Url2TextException
     {
-        try (final Url2TextResponse response = new Url2TextResponse())
+        try (final Response response = new Response())
         {
             response.setTextReader(new StringReader("value"));
             response.setTextReader(new StringReader("repeat"));
         }
-    }
-    
-    @Test
-    public void testGetText() throws IOException, Url2TextException 
-    {
-        try (final Url2TextResponse response = new Url2TextResponse())
-        {
-            // check STR_NOT_SET then value
-            assertEquals(STR_NOT_SET, response.getText());
-            response.setTextReader(new StringReader("value"));
-            assertEquals("value", response.getText());
-            // now check the read text has been retained.
-            assertEquals("value", response.getText());
-        }        
     }
 
 }

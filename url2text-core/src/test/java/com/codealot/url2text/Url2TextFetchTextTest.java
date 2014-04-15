@@ -55,7 +55,7 @@ public class Url2TextFetchTextTest
     @Test
     public void test404() throws Url2TextException, IOException
     {
-        try (final Url2TextResponse response = this.fetcher.contentAsText(
+        try (final Response response = this.fetcher.contentAsText(
                 LOCAL_HOST + "not-exists.html", null))
         {
             assertEquals(404, response.getStatus());
@@ -65,14 +65,14 @@ public class Url2TextFetchTextTest
     @Test
     public void testLastModified() throws Url2TextException, IOException
     {
-        try (Url2TextResponse response = this.fetcher.contentAsText(
+        try (Response response = this.fetcher.contentAsText(
                 REMOTE_HOST, null))
         {
             final HashMap<String, String> additionalHeaders = new HashMap<>();
             additionalHeaders.put(HDR_IF_MODIFIED_SINCE,
                     response.getLastModified());
 
-            try (Url2TextResponse r2 = this.fetcher.contentAsText(
+            try (Response r2 = this.fetcher.contentAsText(
                     "http://example.com", additionalHeaders))
             {
                 assertEquals(304, r2.getStatus());
@@ -83,14 +83,14 @@ public class Url2TextFetchTextTest
     @Test
     public void testEtag() throws Url2TextException, IOException
     {
-        try (Url2TextResponse response = this.fetcher.contentAsText(
+        try (Response response = this.fetcher.contentAsText(
                 REMOTE_HOST, null))
         {
             assertEquals(200, response.getStatus());
             final HashMap<String, String> additionalHeaders = new HashMap<>();
             additionalHeaders.put(HDR_IF_NONE_MATCH, response.getEtag());
 
-            try (Url2TextResponse r2 = this.fetcher.contentAsText(
+            try (Response r2 = this.fetcher.contentAsText(
                     "http://example.com", additionalHeaders))
             {
                 assertEquals(304, r2.getStatus());
@@ -108,7 +108,7 @@ public class Url2TextFetchTextTest
     @Test(expected = Url2TextException.class)
     public void testEncryptedOdt() throws Url2TextException, IOException
     {
-        try (final Url2TextResponse response = this.fetcher.contentAsText(
+        try (final Response response = this.fetcher.contentAsText(
                 LOCAL_HOST + "encrypted.odt", null))
         {
             // have to consume the response reader to trigger the exception
@@ -120,7 +120,7 @@ public class Url2TextFetchTextTest
     public void testIncludeHeaders() throws Exception
     {
         this.fetcher.setIncludeHeaders(true);
-        try(final Url2TextResponse response = this.fetcher.contentAsText(LOCAL_HOST
+        try(final Response response = this.fetcher.contentAsText(LOCAL_HOST
                 + "plain-text.txt", null)) {
             assertEquals(200, response.getStatus());
             final JsonNode root = this.mapper.readTree(response.toJson());
@@ -132,7 +132,7 @@ public class Url2TextFetchTextTest
     public void testIncludeMetadata() throws Exception
     {
         this.fetcher.setIncludeMetadata(true);
-        try (final Url2TextResponse response = this.fetcher.contentAsText(
+        try (final Response response = this.fetcher.contentAsText(
                 LOCAL_HOST + "binary.odt", null))
         {
             assertEquals(200, response.getStatus());
@@ -144,7 +144,7 @@ public class Url2TextFetchTextTest
     @Test
     public void testFetchTextPlain() throws Url2TextException, IOException
     {
-        try (final Url2TextResponse response = this.fetcher.contentAsText(
+        try (final Response response = this.fetcher.contentAsText(
                 LOCAL_HOST + "plain-text.txt", null))
         {
             assertEquals(200, response.getStatus());
@@ -155,7 +155,7 @@ public class Url2TextFetchTextTest
     @Test
     public void testFetchTextHTML() throws Url2TextException, IOException
     {
-        try (final Url2TextResponse response = this.fetcher.contentAsText(
+        try (final Response response = this.fetcher.contentAsText(
                 LOCAL_HOST + "html-4-JS.html", null))
         {
             assertEquals(200, response.getStatus());
@@ -167,7 +167,7 @@ public class Url2TextFetchTextTest
     public void testFetchTextHTMLwithJS() throws Url2TextException, IOException
     {
         this.fetcher.setJavascriptEnabled(true);
-        try (final Url2TextResponse response = this.fetcher.contentAsText(
+        try (final Response response = this.fetcher.contentAsText(
                 LOCAL_HOST + "html-4-JS.html", null))
         {
             assertEquals(200, response.getStatus());
@@ -178,7 +178,7 @@ public class Url2TextFetchTextTest
     @Test
     public void testFetchTextXML() throws Url2TextException, IOException
     {
-        try (final Url2TextResponse response = this.fetcher.contentAsText(
+        try (final Response response = this.fetcher.contentAsText(
                 LOCAL_HOST + "example.wsdl", null))
         {
             assertEquals(200, response.getStatus());
@@ -189,7 +189,7 @@ public class Url2TextFetchTextTest
     @Test
     public void testFetchTextDocBook4() throws Url2TextException, IOException
     {
-        try (final Url2TextResponse response = this.fetcher.contentAsText(
+        try (final Response response = this.fetcher.contentAsText(
                 LOCAL_HOST + "docbook.xml", null))
         {
             assertEquals(200, response.getStatus());
@@ -202,7 +202,7 @@ public class Url2TextFetchTextTest
     @Test
     public void testFetchTextDocBook5() throws Url2TextException, IOException
     {
-        try (final Url2TextResponse response = this.fetcher.contentAsText(
+        try (final Response response = this.fetcher.contentAsText(
                 LOCAL_HOST + "docbook5.xml", null))
         {
             assertEquals(200, response.getStatus());
@@ -216,7 +216,7 @@ public class Url2TextFetchTextTest
     public void testFetchTextBinary() throws Url2TextException, IOException
     {
         this.fetcher.setIncludeMetadata(true);
-        try (final Url2TextResponse response = this.fetcher.contentAsText(
+        try (final Response response = this.fetcher.contentAsText(
                 LOCAL_HOST + "binary.odt", null))
         {
             assertEquals(200, response.getStatus());
