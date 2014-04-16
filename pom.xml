@@ -5,7 +5,7 @@
 	<groupId>com.codealot.url2text</groupId>
 	<artifactId>url2text-parent</artifactId>
 	<packaging>pom</packaging>
-	<version>0.5.0</version>
+	<version>${url2text.version}</version>
 	<name>Url2Text</name>
 	<description>Url2Text - Convert (almost) any URL to text</description>
 
@@ -44,6 +44,7 @@
 
 	<properties>
 		<!-- System properties -->
+		<url2text.version>0.5.1-SNAPSHOT</url2text.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
