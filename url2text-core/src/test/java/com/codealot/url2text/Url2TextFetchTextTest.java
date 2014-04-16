@@ -153,6 +153,17 @@ public class Url2TextFetchTextTest
     }
 
     @Test
+    public void testFetchEmptyFile() throws Url2TextException, IOException
+    {
+        try (final Response response = this.fetcher.contentAsText(
+                LOCAL_HOST + "empty.doc", null))
+        {
+            assertEquals(200, response.getStatus());
+            assertTrue(response.getText().contains(""));
+        }
+    }
+
+    @Test
     public void testFetchTextHTML() throws Url2TextException, IOException
     {
         try (final Response response = this.fetcher.contentAsText(

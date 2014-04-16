@@ -117,6 +117,8 @@ public class Url2Text
     // FUTURE deal with files of unknown length
 
     // FUTURE better error reporting when failing on encrypted documents
+    
+    // FUTURE handle chunked downloads
 
     // SLF4J logger instance
     private static final Logger LOG = LoggerFactory.getLogger(Url2Text.class);
@@ -470,43 +472,52 @@ public class Url2Text
                     + this.maxContentLength + ", actual is "
                     + response.getContentLength());
         }
-
-        // discover if content is DocBook
-        final boolean isDocBook = isDocbook(page);
-
-        // retrieve metadata, and/or binary content using Tika
-        if (this.includeMetadata || isDocBook || page instanceof BinaryPage
-                || page instanceof UnexpectedPage)
+        
+        // check for empty document
+        if (response.getContentLength() == 0) 
         {
-            invokeTika(response, page);
+            LOG.warn("Request URL " + requestUrl + " has no Content-Length.");
+            response.setTextReader(new StringReader(""));
         }
-
-        // retrieve text content, if not already determined above
-        if (page.isHtmlPage())
+        else 
         {
-            // use HtmlUnit's DOM for JavaScript execution artifacts
-            final HtmlPage source = (HtmlPage) page;
-            response.setTextReader(new StringReader(source.asText()));
-        }
-        else if (page instanceof TextPage)
-        {
-            final TextPage source = (TextPage) page;
-            response.setTextReader(new StringReader(source.getContent()));
-        }
-        else if (page instanceof XmlPage && !isDocBook)
-        {
-            // Return the unaltered document (XHtml is dealt with above).
-            response.setTextReader(new StringReader(page.getWebResponse().getContentAsString()));
-        }
-        else if (page instanceof JavaScriptPage)
-        {
-            final JavaScriptPage source = (JavaScriptPage) page;
-            response.setTextReader(new StringReader(source.getContent()));
-        }
-
-        if (LOG.isDebugEnabled())
-        {
-            LOG.debug(response.toString());
+            // discover if content is DocBook
+            final boolean isDocBook = isDocbook(page);
+    
+            // retrieve metadata, and/or binary content using Tika
+            if (this.includeMetadata || isDocBook || page instanceof BinaryPage
+                    || page instanceof UnexpectedPage)
+            {
+                invokeTika(response, page);
+            }
+    
+            // retrieve text content, if not already determined above
+            if (page.isHtmlPage())
+            {
+                // use HtmlUnit's DOM for JavaScript execution artifacts
+                final HtmlPage source = (HtmlPage) page;
+                response.setTextReader(new StringReader(source.asText()));
+            }
+            else if (page instanceof TextPage)
+            {
+                final TextPage source = (TextPage) page;
+                response.setTextReader(new StringReader(source.getContent()));
+            }
+            else if (page instanceof XmlPage && !isDocBook)
+            {
+                // Return the unaltered document (XHtml is dealt with above).
+                response.setTextReader(new StringReader(page.getWebResponse().getContentAsString()));
+            }
+            else if (page instanceof JavaScriptPage)
+            {
+                final JavaScriptPage source = (JavaScriptPage) page;
+                response.setTextReader(new StringReader(source.getContent()));
+            }
+    
+            if (LOG.isDebugEnabled())
+            {
+                LOG.debug(response.toString());
+            }
         }
 
         return response;
