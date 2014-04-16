@@ -1,5 +1,6 @@
 package com.codealot.textstore;
 
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
 import java.nio.charset.StandardCharsets;
@@ -71,14 +72,14 @@ public class FileStore implements TextStore
     }
 
     @Override
-    public String getText(final String hash) throws IOException
+    public String getText(final String id) throws IOException
     {
-        checkHash(hash);
+        checkId(id);
 
-        final Path textPath = Paths.get(this.storeRoot, hash);
+        final Path textPath = Paths.get(this.storeRoot, id);
         if (!Files.isReadable(textPath))
         {
-            throw new IOException("Id " + hash + " has no readable content.");
+            throw new IOException("Id " + id + " has no readable content.");
         }
         final byte[] bytes = Files.readAllBytes(textPath);
 
@@ -118,12 +119,12 @@ public class FileStore implements TextStore
     }
 
     @Override
-    public void deleteText(final String hash) throws IOException
+    public boolean deleteText(final String id) throws IOException
     {
-        checkHash(hash);
+        checkId(id);
 
-        final Path textPath = Paths.get(this.storeRoot, hash);
-        Files.delete(textPath);
+        final Path textPath = Paths.get(this.storeRoot, id);
+        return Files.deleteIfExists(textPath);
     }
 
     private MessageDigest getDigester()
@@ -138,7 +139,7 @@ public class FileStore implements TextStore
         }
     }
 
-    private void checkHash(final String hash)
+    private void checkId(final String hash)
     {
         Objects.requireNonNull(hash, "No id provided");
         if (!hash.matches("[A-F0-9]{40}"))
@@ -182,7 +183,7 @@ public class FileStore implements TextStore
             while ((readLength = readerAsBytes.read(bytes)) > 0)
             {
                 digester.update(bytes, 0, readLength);
-                
+
                 final byte[] readBytes = Arrays.copyOf(bytes, readLength);
                 Files.write(textPath, readBytes, StandardOpenOption.CREATE,
                         StandardOpenOption.WRITE, StandardOpenOption.APPEND);
@@ -197,7 +198,8 @@ public class FileStore implements TextStore
                 // rename the file
                 Files.move(textPath, finalPath);
             }
-            else {
+            else
+            {
                 // already existed, so delete uuid named one
                 Files.deleteIfExists(textPath);
             }
@@ -210,6 +212,19 @@ public class FileStore implements TextStore
                 readerAsBytes.close();
             }
         }
+    }
+
+    @Override
+    public Reader getTextReader(String id) throws IOException
+    {
+        checkId(id);
+
+        final Path textPath = Paths.get(this.storeRoot, id);
+        if (!Files.isReadable(textPath))
+        {
+            throw new IOException("Id " + id + " has no readable content.");
+        }
+        return new FileReader(textPath.toFile());
     }
 
 }

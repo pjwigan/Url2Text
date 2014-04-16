@@ -4,6 +4,7 @@ import static org.junit.Assert.*;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.Reader;
 import java.io.StringReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -12,6 +13,7 @@ import java.nio.file.Paths;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+
 
 public class FileStoreTest
 {
@@ -39,6 +41,20 @@ public class FileStoreTest
             Files.deleteIfExists(storeRoot);
         }
     }
+    
+    private String getTextFromReader(Reader reader) throws IOException
+    {
+        final char[] arr = new char[1024];
+        final StringBuilder buf = new StringBuilder();
+        int numChars;
+
+        while ((numChars = reader.read(arr, 0, arr.length)) > 0)
+        {
+            buf.append(arr, 0, numChars);
+        }
+        return buf.toString();
+    }
+
     
     private int countFiles() 
     {
@@ -234,7 +250,70 @@ public class FileStoreTest
         String id = fileStore.storeText(text);
         Path testPath = Paths.get(storeRoot.toString(), id);
         assertTrue(Files.exists(testPath));
-        fileStore.deleteText(id);
+        boolean result = fileStore.deleteText(id);
+        assertTrue(result);
         assertFalse(Files.exists(testPath));
+    }
+    
+    @Test
+    public void testDeleteTextDeletedText() throws IOException
+    {
+        String text = "This is a test";
+        String id = fileStore.storeText(text);
+        Path testPath = Paths.get(storeRoot.toString(), id);
+        assertTrue(Files.exists(testPath));
+        fileStore.deleteText(id);
+        assertFalse(fileStore.deleteText(id));
+    }
+    
+    @Test 
+    public void testDeleteTextNoText() throws IOException
+    {
+        assertFalse(fileStore.deleteText("1234567890123456789012345678901234567890"));
+    }
+    
+    @Test(expected = NullPointerException.class)
+    public void testGetTextReaderNullId() throws IOException
+    {
+        fileStore.getTextReader(null);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testGetTextReaderEmptyId() throws IOException
+    {
+        fileStore.getTextReader("");
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testGetReaderTextShortId() throws IOException
+    {
+        fileStore.getTextReader("ABCD1234");
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testGetTextReaderNotHexId() throws IOException
+    {
+        fileStore.getTextReader("123456789012345678901234567890123456789Z");
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testGetTextReaderLongId() throws IOException
+    {
+        fileStore.getTextReader("123456789012345678901234567890123456789012345");
+    }
+
+    @Test(expected = IOException.class)
+    public void testGetTextReaderIdUnknown() throws IOException
+    {
+        fileStore.getTextReader("1234567890123456789012345678901234567890");
+    }
+
+    @Test
+    public void testGetTextReader() throws IOException
+    {
+        String text = "This is a test";
+        String id = fileStore.storeText(text);
+        Reader reader = fileStore.getTextReader(id);
+        assertEquals(text, getTextFromReader(reader));
     }
 }

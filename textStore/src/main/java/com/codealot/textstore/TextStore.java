@@ -36,7 +36,20 @@ public interface TextStore
     public String getText(String id) throws IOException;
     
     /**
+     * Returns a Reader on the stored text.
+     * <p>
+     * Implementors should be aware of how this may be a blocking operation.
+     * 
+     * @param id
+     * @return
+     */
+    public Reader getTextReader(String id) throws IOException;
+    
+    /**
      * Store the text and return an id by which it can be retrieved or deleted.
+     * <p>
+     * This method is idempotent; i.e. it will return the same id if given an
+     * existing text to store.
      * 
      * @param text
      * @return id of the stored text
@@ -46,6 +59,10 @@ public interface TextStore
     
     /**
      * Store the text and return an id by which it can be retrieved or deleted.
+     * As it has been consumed, the provided Reader should be closed.
+     * <p>
+     * This method is idempotent; i.e. it will return the same id if given an
+     * existing text to store.
      * 
      * @param reader source of text
      * @return id of the stored text
@@ -55,9 +72,12 @@ public interface TextStore
     
     /**
      * Delete the text represented by id from the store.
+     * <p>
+     * It is up to the implementation to decide if this operation is idempotent.
      * 
      * @param id
+     * @return true if the text was deleted
      * @throws IOException
      */
-    public void deleteText(String id) throws IOException;
+    public boolean deleteText(String id) throws IOException;
 }
