@@ -474,7 +474,7 @@ public class Url2Text
         }
         
         // check for empty document
-        if (response.getContentLength() == 0) 
+        if (response.getContentLength() <= 0) 
         {
             LOG.warn("Request URL " + requestUrl + " has no Content-Length.");
             response.setTextReader(new StringReader(""));
@@ -1036,7 +1036,17 @@ public class Url2Text
             final Metadata metadata = new Metadata();
             final Tika tika = new Tika();
 
-            final String contentType = response.getContentType();
+            // use the raw header, as this may include charset info.
+            String contentType = null;
+            List<NameValuePair> headers = page.getWebResponse().getResponseHeaders();
+            for (NameValuePair header : headers) 
+            {
+                final String name = header.getName();
+                if (name.toLowerCase(Locale.ENGLISH).equals(HttpHeaders.CONTENT_TYPE.toLowerCase(Locale.ENGLISH))) 
+                {
+                    contentType = header.getValue();
+                }
+            }
             if (contentType != null && contentType.length() > 0)
             {
                 metadata.add(HttpHeaders.CONTENT_TYPE, contentType);
