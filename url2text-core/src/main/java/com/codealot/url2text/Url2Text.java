@@ -70,8 +70,8 @@ import com.gargoylesoftware.htmlunit.xml.XmlPage;
     }
  * </code>
  * <p>
- * The `Response` object is a POJO encapsulating the fetched text,
- * metadata, headers, etc.
+ * The `Response` object is a POJO encapsulating the fetched text, metadata,
+ * headers, etc.
  * <p>
  * Currently Url2Text emulates FireFox. (This project was inspired by a need to
  * act as a proxy for a human user).
@@ -117,11 +117,12 @@ public class Url2Text
     // FUTURE deal with files of unknown length
 
     // FUTURE better error reporting when failing on encrypted documents
-    
+
     // FUTURE handle chunked downloads
 
     // SLF4J logger instance
-    private static final Logger LOG = LoggerFactory.getLogger(Url2Text.class);
+    private static final Logger LOG                         = LoggerFactory
+                                                                    .getLogger(Url2Text.class);
 
     // ######################
     // ##### PROPERTIES #####
@@ -131,39 +132,39 @@ public class Url2Text
     // equals() and hashCode() etc.
 
     // Number of configurable properties
-    private static final int PROPERTY_COUNT = URL2TEXT_PROPERTY_KEYS.length;
+    private static final int    PROPERTY_COUNT              = URL2TEXT_PROPERTY_KEYS.length;
 
     // HtmlUnit WebClientOptions (not set by the CLI)
-    private boolean activeXNative = false;
-    private boolean appletEnabled = false;
-    private boolean geolocationEnabled = false;
-    private boolean popupBlockerEnabled = true;
-    private boolean exceptionOnScriptError = false;
-    private boolean exceptionOnFailingStatus = false;
-    private boolean printContentOnFailingStatus = false;
+    private boolean             activeXNative               = false;
+    private boolean             appletEnabled               = false;
+    private boolean             geolocationEnabled          = false;
+    private boolean             popupBlockerEnabled         = true;
+    private boolean             exceptionOnScriptError      = false;
+    private boolean             exceptionOnFailingStatus    = false;
+    private boolean             printContentOnFailingStatus = false;
 
     // HtmlUnit WebClientOptions (set by the CLI)
-    private boolean cssEnabled = false;
-    private boolean doNotTrackEnabled = false;
-    private boolean javascriptEnabled = false;
-    private boolean useInsecureSSL = false;
-    private boolean redirectEnabled = true;
+    private boolean             cssEnabled                  = false;
+    private boolean             doNotTrackEnabled           = false;
+    private boolean             javascriptEnabled           = false;
+    private boolean             useInsecureSSL              = false;
+    private boolean             redirectEnabled             = true;
 
     // HtmlUnit CookieManager options
-    private boolean cookiesEnabled = true;
-    private boolean clearCookies = true;
-    private boolean clearExpiredCookies = true;
+    private boolean             cookiesEnabled              = true;
+    private boolean             clearCookies                = true;
+    private boolean             clearExpiredCookies         = true;
 
     // output modifying options
-    private boolean includeHeaders = false;
-    private boolean includeMetadata = false;
+    private boolean             includeHeaders              = false;
+    private boolean             includeMetadata             = false;
 
     // Transaction timeouts, in seconds.
-    private int networkTimeout = 90;
-    private int javascriptTimeout = 20;
+    private int                 networkTimeout              = 90;
+    private int                 javascriptTimeout           = 20;
 
     // Max Content Length
-    private long maxContentLength = 1_024 * 1_024;
+    private long                maxContentLength            = 1_024 * 1_024;
 
     // ########################
     // ##### CONSTRUCTORS #####
@@ -472,25 +473,25 @@ public class Url2Text
                     + this.maxContentLength + ", actual is "
                     + response.getContentLength());
         }
-        
+
         // check for empty document
-        if (response.getContentLength() <= 0) 
+        if (response.getContentLength() <= 0)
         {
             LOG.warn("Request URL " + requestUrl + " has no Content-Length.");
             response.setTextReader(new StringReader(""));
         }
-        else 
+        else
         {
             // discover if content is DocBook
             final boolean isDocBook = isDocbook(page);
-    
+
             // retrieve metadata, and/or binary content using Tika
             if (this.includeMetadata || isDocBook || page instanceof BinaryPage
                     || page instanceof UnexpectedPage)
             {
                 invokeTika(response, page);
             }
-    
+
             // retrieve text content, if not already determined above
             if (page.isHtmlPage())
             {
@@ -506,14 +507,15 @@ public class Url2Text
             else if (page instanceof XmlPage && !isDocBook)
             {
                 // Return the unaltered document (XHtml is dealt with above).
-                response.setTextReader(new StringReader(page.getWebResponse().getContentAsString()));
+                response.setTextReader(new StringReader(page.getWebResponse()
+                        .getContentAsString()));
             }
             else if (page instanceof JavaScriptPage)
             {
                 final JavaScriptPage source = (JavaScriptPage) page;
                 response.setTextReader(new StringReader(source.getContent()));
             }
-    
+
             if (LOG.isDebugEnabled())
             {
                 LOG.debug(response.toString());
@@ -841,8 +843,8 @@ public class Url2Text
      * @param includeHeaders
      * @return populated response
      */
-    private Response buildResponse(final URL requestUrl,
-            final Page page, final boolean includeHeaders)
+    private Response buildResponse(final URL requestUrl, final Page page,
+            final boolean includeHeaders)
     {
         final Response response = new Response();
 
@@ -1019,7 +1021,7 @@ public class Url2Text
     /**
      * Call Tika to convert to text and/or extract content metadata.
      * <p>
-     * The Reader returned by Tika is fed into the response.  Note that this
+     * The Reader returned by Tika is fed into the response. Note that this
      * reader is responsible for closing the input stream.
      * 
      * @param response
@@ -1038,11 +1040,13 @@ public class Url2Text
 
             // use the raw header, as this may include charset info.
             String contentType = null;
-            List<NameValuePair> headers = page.getWebResponse().getResponseHeaders();
-            for (NameValuePair header : headers) 
+            List<NameValuePair> headers = page.getWebResponse()
+                    .getResponseHeaders();
+            for (NameValuePair header : headers)
             {
                 final String name = header.getName();
-                if (name.toLowerCase(Locale.ENGLISH).equals(HttpHeaders.CONTENT_TYPE.toLowerCase(Locale.ENGLISH))) 
+                if (name.toLowerCase(Locale.ENGLISH).equals(
+                        HttpHeaders.CONTENT_TYPE.toLowerCase(Locale.ENGLISH)))
                 {
                     contentType = header.getValue();
                 }

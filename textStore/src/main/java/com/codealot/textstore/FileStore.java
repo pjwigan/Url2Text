@@ -75,14 +75,8 @@ public class FileStore implements TextStore
     public String getText(final String id) throws IOException
     {
         checkId(id);
-
-        final Path textPath = Paths.get(this.storeRoot, id);
-        if (!Files.isReadable(textPath))
-        {
-            throw new IOException("Id " + id + " has no readable content.");
-        }
+        final Path textPath = idToPath(id);
         final byte[] bytes = Files.readAllBytes(textPath);
-
         return new String(bytes, StandardCharsets.UTF_8);
     }
 
@@ -122,7 +116,6 @@ public class FileStore implements TextStore
     public boolean deleteText(final String id) throws IOException
     {
         checkId(id);
-
         final Path textPath = Paths.get(this.storeRoot, id);
         return Files.deleteIfExists(textPath);
     }
@@ -139,13 +132,23 @@ public class FileStore implements TextStore
         }
     }
 
-    private void checkId(final String hash)
+    private void checkId(final String id)
     {
-        Objects.requireNonNull(hash, "No id provided");
-        if (!hash.matches("[A-F0-9]{40}"))
+        Objects.requireNonNull(id, "No id provided");
+        if (!id.matches("[A-F0-9]{40}"))
         {
-            throw new IllegalArgumentException("Bad id: " + hash);
+            throw new IllegalArgumentException("Bad id: " + id);
         }
+    }
+    
+    private Path idToPath(final String id) throws IOException
+    {
+        final Path textPath = Paths.get(this.storeRoot, id);
+        if (!Files.isReadable(textPath))
+        {
+            throw new IOException("Id " + id + " has no readable content.");
+        }
+        return textPath;
     }
 
     private static String byteToHex(final byte[] hash)
@@ -218,13 +221,16 @@ public class FileStore implements TextStore
     public Reader getTextReader(String id) throws IOException
     {
         checkId(id);
-
-        final Path textPath = Paths.get(this.storeRoot, id);
-        if (!Files.isReadable(textPath))
-        {
-            throw new IOException("Id " + id + " has no readable content.");
-        }
+        final Path textPath = idToPath(id);
         return new FileReader(textPath.toFile());
+    }
+
+    @Override
+    public long getLength(String id) throws IOException
+    {
+        checkId(id);
+        final Path textPath = idToPath(id);
+        return textPath.toFile().length();
     }
 
 }

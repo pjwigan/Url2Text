@@ -26,6 +26,9 @@ import java.io.Reader;
  */
 public interface TextStore
 {
+    
+    // FUTURE store charset
+
     /**
      * Fetch the text represented by an id.
      * 
@@ -34,6 +37,14 @@ public interface TextStore
      * @throws IOException
      */
     public String getText(String id) throws IOException;
+    
+    /**
+     * Returns the size of the uncompressed text represented by the supplied id.
+     * 
+     * @param id
+     * @return length of uncompressed text
+     */
+    public long getLength(String id) throws IOException;
     
     /**
      * Returns a Reader on the stored text.

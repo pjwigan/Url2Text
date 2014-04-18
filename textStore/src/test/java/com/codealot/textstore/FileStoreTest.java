@@ -316,4 +316,12 @@ public class FileStoreTest
         Reader reader = fileStore.getTextReader(id);
         assertEquals(text, getTextFromReader(reader));
     }
+    
+    @Test
+    public void testGetLength() throws IOException
+    {
+        String text = "This is a test";
+        String id = fileStore.storeText(text);        
+        assertEquals(text.length(), fileStore.getText(id).length());
+    }
 }
