@@ -34,10 +34,12 @@
   		<artifactId>jackson-databind</artifactId>
   	</dependency>
   	<dependency>
+  	    <!-- Ensure commons-logging is excluded -->
   		<groupId>org.slf4j</groupId>
   		<artifactId>jcl-over-slf4j</artifactId>
   	</dependency>
   	<dependency>
+  	    <!-- Guarantees an SLF4J binding -->
   		<groupId>org.slf4j</groupId>
   		<artifactId>slf4j-simple</artifactId>
   		<scope>test</scope>

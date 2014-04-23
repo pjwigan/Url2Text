@@ -114,15 +114,14 @@ public class Url2Text
 
     // FUTURE add credential support
 
-    // FUTURE deal with files of unknown length
+    // FUTURE deal with content of unknown length
 
     // FUTURE better error reporting when failing on encrypted documents
 
     // FUTURE handle chunked downloads
 
     // SLF4J logger instance
-    private static final Logger LOG                         = LoggerFactory
-                                                                    .getLogger(Url2Text.class);
+    private static final Logger LOG = LoggerFactory.getLogger(Url2Text.class);
 
     // ######################
     // ##### PROPERTIES #####
@@ -132,39 +131,39 @@ public class Url2Text
     // equals() and hashCode() etc.
 
     // Number of configurable properties
-    private static final int    PROPERTY_COUNT              = URL2TEXT_PROPERTY_KEYS.length;
+    private static final int PROPERTY_COUNT = URL2TEXT_PROPERTY_KEYS.length;
 
     // HtmlUnit WebClientOptions (not set by the CLI)
-    private boolean             activeXNative               = false;
-    private boolean             appletEnabled               = false;
-    private boolean             geolocationEnabled          = false;
-    private boolean             popupBlockerEnabled         = true;
-    private boolean             exceptionOnScriptError      = false;
-    private boolean             exceptionOnFailingStatus    = false;
-    private boolean             printContentOnFailingStatus = false;
+    private boolean activeXNative = false;
+    private boolean appletEnabled = false;
+    private boolean geolocationEnabled = false;
+    private boolean popupBlockerEnabled = true;
+    private boolean exceptionOnScriptError = false;
+    private boolean exceptionOnFailingStatus = false;
+    private boolean printContentOnFailingStatus = false;
 
     // HtmlUnit WebClientOptions (set by the CLI)
-    private boolean             cssEnabled                  = false;
-    private boolean             doNotTrackEnabled           = false;
-    private boolean             javascriptEnabled           = false;
-    private boolean             useInsecureSSL              = false;
-    private boolean             redirectEnabled             = true;
+    private boolean cssEnabled = false;
+    private boolean doNotTrackEnabled = false;
+    private boolean javascriptEnabled = false;
+    private boolean useInsecureSSL = false;
+    private boolean redirectEnabled = true;
 
     // HtmlUnit CookieManager options
-    private boolean             cookiesEnabled              = true;
-    private boolean             clearCookies                = true;
-    private boolean             clearExpiredCookies         = true;
+    private boolean cookiesEnabled = true;
+    private boolean clearCookies = true;
+    private boolean clearExpiredCookies = true;
 
     // output modifying options
-    private boolean             includeHeaders              = false;
-    private boolean             includeMetadata             = false;
+    private boolean includeHeaders = false;
+    private boolean includeMetadata = false;
 
     // Transaction timeouts, in seconds.
-    private int                 networkTimeout              = 90;
-    private int                 javascriptTimeout           = 20;
+    private int networkTimeout = 90;
+    private int javascriptTimeout = 20;
 
     // Max Content Length
-    private long                maxContentLength            = 1_024 * 1_024;
+    private long maxContentLength = 1_024 * 1_024;
 
     // ########################
     // ##### CONSTRUCTORS #####

@@ -68,8 +68,9 @@ public class Response implements Closeable, AutoCloseable
 
     // text vars
     private Reader textReader = new StringReader(STR_NOT_SET);
-    private String text = null; // used to make toString() and toJson() repeatable.
-    
+    private String text = null; // used to make getText(), toString() and
+                                // toJson() repeatable.
+
     // operational flag
     private boolean textSupplied = false;
 
@@ -520,7 +521,7 @@ public class Response implements Closeable, AutoCloseable
     }
 
     /**
-     * Consumes the Reader, which is then closed. 
+     * Consumes the Reader, which is then closed.
      * <p>
      * Beware. This method consumes the internal Reader, creating a buffer of
      * unlimited size.
@@ -552,7 +553,8 @@ public class Response implements Closeable, AutoCloseable
     public void setTextReader(final Reader reader)
     {
         Objects.requireNonNull(reader, "No Reader supplied.");
-        if (this.textSupplied) {
+        if (this.textSupplied)
+        {
             throw new IllegalStateException("Text or Reader already supplied.");
         }
         this.textReader = reader;
@@ -578,7 +580,7 @@ public class Response implements Closeable, AutoCloseable
             }
             this.text = buf.toString();
             this.textReader.close();
-            this.textReader = null; 
+            this.textReader = null;
         }
         catch (IOException e)
         {

@@ -25,7 +25,7 @@ package com.codealot.url2text;
  */
 public class Constants
 {
-    public static final String APP_VERSION = "0.5.0";
+    public static final String APP_VERSION = "0.5.1";
 
     // *_NOT_SET indicators, used as initialisers.
     public static final String STR_NOT_SET = "*not-set*";
