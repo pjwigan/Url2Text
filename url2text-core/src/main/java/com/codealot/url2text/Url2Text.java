@@ -103,7 +103,7 @@ import com.gargoylesoftware.htmlunit.xml.XmlPage;
  *         implied. See the License for the specific language governing
  *         permissions and limitations under the License.
  */
-public class Url2Text
+public class Url2Text implements Cloneable
 {
     // FUTURE suppress 'enable javascript' and 'enable cookies' messages when
     // those options have been specified (but might be an HtmlUnit bug)

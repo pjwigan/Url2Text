@@ -50,6 +50,8 @@ import org.apache.commons.io.input.ReaderInputStream;
  */
 public class FileStore implements TextStore
 {
+    // FUTURE add a getTextUrl(baseUrl) method to serve as static object
+    
     // path to the root of the file store. Must be a directory.
     private final String storeRoot;
 
