@@ -2,6 +2,7 @@ package com.codealot.textstore;
 
 import java.io.IOException;
 import java.io.Reader;
+import java.util.Date;
 
 /**
  * Interface to decouple the storage and retrieval of text from the medium.
@@ -45,6 +46,15 @@ public interface TextStore
      * @return length of uncompressed text
      */
     public long getLength(String id) throws IOException;
+    
+    /**
+     * Returns the Date (in UTC) that the text of the given id was stored.
+     * 
+     * @param id
+     * @return
+     * @throws IOException 
+     */
+    public Date getStoreDate(String id) throws IOException;
     
     /**
      * Returns a Reader on the stored text.

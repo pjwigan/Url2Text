@@ -58,7 +58,7 @@ import com.gargoylesoftware.htmlunit.xml.XmlPage;
     fetch.setJavascriptEnabled(true);
     fetch.setIncludeHeaders(true);
     ...
-    try (Response response = fetch.contentAsText("http://example.com")) 
+    try (Response response = fetch.contentAsText("http://example.com", null)) 
     {              
         if (response.getStatus() == 200) {
             return response.toJson();
@@ -178,7 +178,7 @@ public class Url2Text implements Cloneable
     {
         this(null);
     };
-
+    
     /**
      * Constructor that accepts a Properties instance to configure the defaults.
      * <p>
@@ -1073,4 +1073,18 @@ public class Url2Text implements Cloneable
         }
     }
 
+    @Override
+    public Url2Text clone() 
+    {
+        try
+        {
+            return (Url2Text) super.clone();
+        }
+        catch (CloneNotSupportedException e)
+        {
+            throw new RuntimeException(e);
+        }
+    }
+
+    
 }

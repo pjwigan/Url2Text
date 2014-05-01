@@ -8,9 +8,11 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
+import java.nio.file.attribute.FileTime;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.Formatter;
 import java.util.Objects;
 import java.util.UUID;
@@ -233,6 +235,15 @@ public class FileStore implements TextStore
         checkId(id);
         final Path textPath = idToPath(id);
         return textPath.toFile().length();
+    }
+
+    @Override
+    public Date getStoreDate(String id) throws IOException
+    {
+        checkId(id);
+        final Path textPath = idToPath(id);
+        FileTime time = Files.getLastModifiedTime(textPath);
+        return new Date(time.toMillis());
     }
 
 }
