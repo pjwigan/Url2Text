@@ -6,35 +6,46 @@ import org.junit.Test;
 
 public class NameAndValueTest {
     
-    private final NameAndValue namesAndValues = new NameAndValue();
+    private final NameAndValue nameAndValue = new NameAndValue();
 
     @Test
     public void testNameAndValue() {
         // make sure no nulls are returned
         
-        assertEquals(STR_NOT_SET, this.namesAndValues.getName());
-        assertEquals(STR_NOT_SET, this.namesAndValues.getValue());
+        assertEquals(STR_NOT_SET, this.nameAndValue.getName());
+        assertEquals(STR_NOT_SET, this.nameAndValue.getValue());
     }
 
     @Test
     public void testNameAndValueStringString() {
         // make sure no nulls are returned
-        assertEquals(STR_NOT_SET, this.namesAndValues.getName());
-        assertEquals(STR_NOT_SET, this.namesAndValues.getValue());
+        assertEquals(STR_NOT_SET, this.nameAndValue.getName());
+        assertEquals(STR_NOT_SET, this.nameAndValue.getValue());
     }
 
     @Test
     public void testSetName() {
         // make sure no nulls are returned
-        this.namesAndValues.setName(null);
-        assertEquals("", this.namesAndValues.getName());
+        this.nameAndValue.setName(null);
+        assertEquals("", this.nameAndValue.getName());
     }
 
     @Test
     public void testSetValue() {
         // make sure no nulls are returned
-        this.namesAndValues.setValue(null);
-        assertEquals("", this.namesAndValues.getValue());
+        this.nameAndValue.setValue(null);
+        assertEquals("", this.nameAndValue.getValue());
     }
 
+    @Test
+    public void testEquals()
+    {
+        NameAndValue nameAndValue2 = new NameAndValue();
+        
+        assertEquals(nameAndValue, nameAndValue2);
+        
+        nameAndValue2.setName("name");
+        
+        assertNotEquals(nameAndValue, nameAndValue2);
+    }
 }

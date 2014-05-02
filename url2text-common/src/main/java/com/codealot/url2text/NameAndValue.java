@@ -3,6 +3,7 @@ package com.codealot.url2text;
 import static com.codealot.url2text.Constants.*;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 /**
  * Avoids a heavyweight dependency.
@@ -87,4 +88,38 @@ public class NameAndValue implements Serializable
         this.value = (value == null) ? "" : value;
     }
 
+    @Override
+    public int hashCode()
+    {
+        return Objects.hash(name, value);
+    }
+
+    @Override
+    public boolean equals(final Object obj)
+    {
+        boolean result = false;
+        if (this == obj)
+        {
+            result = true;
+        }
+        else if (obj == null || obj.getClass() != this.getClass())
+        {
+            result = false;
+        }
+        else
+        {
+            final NameAndValue test = (NameAndValue) obj;
+            // all content is included in toString(), so this is safe.
+            result = test.toString().equals(this.toString());
+        }
+        return result;
+    }
+
+    @Override
+    public String toString()
+    {
+        return name + " : " + value;
+    }
+
+    
 }

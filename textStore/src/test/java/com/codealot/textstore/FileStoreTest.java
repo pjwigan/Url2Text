@@ -9,6 +9,7 @@ import java.io.StringReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Date;
 
 import org.junit.After;
 import org.junit.Before;
@@ -323,5 +324,14 @@ public class FileStoreTest
         String text = "This is a test";
         String id = fileStore.storeText(text);        
         assertEquals(text.length(), fileStore.getText(id).length());
+    }
+    
+    @Test
+    public void testGetStoreDate() throws IOException 
+    {
+        String text = "This is a test";
+        String id = fileStore.storeText(text);        
+        Date date = fileStore.getStoreDate(id);
+        assertTrue(date.getTime() > 0);
     }
 }
