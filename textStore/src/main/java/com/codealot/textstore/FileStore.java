@@ -186,14 +186,22 @@ public class FileStore implements TextStore
         {
             final byte[] bytes = new byte[1024];
             int readLength = 0;
+            long totalRead = 0L;
 
             while ((readLength = readerAsBytes.read(bytes)) > 0)
             {
+                totalRead += readLength;
+                
                 digester.update(bytes, 0, readLength);
 
                 final byte[] readBytes = Arrays.copyOf(bytes, readLength);
                 Files.write(textPath, readBytes, StandardOpenOption.CREATE,
                         StandardOpenOption.WRITE, StandardOpenOption.APPEND);
+            }
+            // check that something was read
+            if (totalRead == 0L) 
+            {
+                throw new IOException("reader had no content");
             }
             // make the hash
             final String hash = byteToHex(digester.digest());
