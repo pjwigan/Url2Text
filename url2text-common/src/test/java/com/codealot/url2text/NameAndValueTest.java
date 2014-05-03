@@ -48,4 +48,17 @@ public class NameAndValueTest {
         
         assertNotEquals(nameAndValue, nameAndValue2);
     }
+    
+    @Test
+    public void testCompareTo()
+    {
+        NameAndValue nav13 = new NameAndValue("1", "3");
+        NameAndValue nav22 = new NameAndValue("2", "2");
+        NameAndValue nav23 = new NameAndValue("2", "3");
+        
+        assertTrue(nav22.compareTo(nav13) > 0);
+        assertTrue(nav13.compareTo(nav22) < 0);
+        assertTrue(nav13.compareTo(new NameAndValue("1", "3")) == 0);
+        assertTrue(nav23.compareTo(nav22) > 0);
+    }
 }

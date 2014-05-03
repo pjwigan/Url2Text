@@ -31,12 +31,11 @@ import java.util.Objects;
  *         permissions and limitations under the License.
  */
 @SuppressWarnings("serial")
-public class NameAndValue implements Serializable
+public class NameAndValue implements Serializable, Comparable<NameAndValue>
 {
     private String name = STR_NOT_SET;
     private String value = STR_NOT_SET;
 
-    
     public NameAndValue()
     {
         // default
@@ -121,5 +120,20 @@ public class NameAndValue implements Serializable
         return name + " : " + value;
     }
 
-    
+    @Override
+    public int compareTo(NameAndValue test)
+    {
+        Objects.requireNonNull(test);
+        
+        int nameComp = this.name.compareTo(test.name);
+        if (nameComp == 0)
+        {
+            return this.value.compareTo(test.value);
+        }
+        else
+        {
+            return nameComp;
+        }
+    }
+
 }

@@ -773,6 +773,9 @@ public class Url2Text implements Cloneable
      * Sets a limit to the Content-Length that will be downloaded. Default is
      * 1MiB. A warning is issued if the value is less than 10,000. Zero or
      * negative values disable length checking.
+     * <p>
+     * Note that Transfer-Encoding chunked content cannot be constrained by
+     * this value.  Use {@link #setNetworkTimeout(int)} instead.
      * 
      * @param maxLength
      */
