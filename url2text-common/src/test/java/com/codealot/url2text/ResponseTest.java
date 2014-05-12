@@ -353,8 +353,10 @@ public class ResponseTest
             // check null == "" == 0L, then number
             assertEquals(LONG_NOT_SET, response.getContentLength());
             response.setContentLength(null);
-            assertEquals(0L, response.getContentLength());
+            assertEquals(LONG_NOT_SET, response.getContentLength());
             response.setContentLength("");
+            assertEquals(LONG_NOT_SET, response.getContentLength());
+            response.setContentLength(0L);
             assertEquals(0L, response.getContentLength());
             response.setContentLength("10000");
             assertEquals(10000L, response.getContentLength());

@@ -174,7 +174,7 @@ public class Url2Text implements Cloneable
     {
         this(null);
     };
-    
+
     /**
      * Constructor that accepts a Properties instance to configure the defaults.
      * <p>
@@ -460,7 +460,7 @@ public class Url2Text implements Cloneable
         final Response response = buildResponse(requestUrl, page,
                 this.includeHeaders);
 
-        // check content length
+        // check content length, if present in response
         if (this.maxContentLength > 0
                 && response.getContentLength() > this.maxContentLength)
         {
@@ -774,8 +774,8 @@ public class Url2Text implements Cloneable
      * 1MiB. A warning is issued if the value is less than 10,000. Zero or
      * negative values disable length checking.
      * <p>
-     * Note that Transfer-Encoding chunked content cannot be constrained by
-     * this value.  Use {@link #setNetworkTimeout(int)} instead.
+     * Note that Transfer-Encoding chunked content cannot be constrained by this
+     * value. Use {@link #setNetworkTimeout(int)} instead.
      * 
      * @param maxLength
      */
@@ -944,6 +944,7 @@ public class Url2Text implements Cloneable
             client.waitForBackgroundJavaScript(this.javascriptTimeout * 1_000);
         }
         final WebClientOptions options = client.getOptions();
+        client.setJavaScriptErrorListener(null);
 
         // configure web client
         options.setActiveXNative(this.activeXNative);
@@ -1024,47 +1025,56 @@ public class Url2Text implements Cloneable
         {
             final long convertStart = new Date().getTime();
 
-            final Metadata metadata = new Metadata();
-            final Tika tika = new Tika();
-
-            // use the raw header, as this may include charset info.
-            String contentType = null;
-            List<NameValuePair> headers = page.getWebResponse()
-                    .getResponseHeaders();
-            for (NameValuePair header : headers)
+            if (response.getContentLength() == 0L)
             {
-                final String name = header.getName();
-                if (name.toLowerCase(Locale.ENGLISH).equals(
-                        HttpHeaders.CONTENT_TYPE.toLowerCase(Locale.ENGLISH)))
+                // Content-Length was present, as zero.
+                response.setTextReader(new StringReader(""));
+            }
+            else
+            {
+                final Metadata metadata = new Metadata();
+                final Tika tika = new Tika();
+
+                // use the raw header, as this may include charset info.
+                String contentType = null;
+                List<NameValuePair> headers = page.getWebResponse()
+                        .getResponseHeaders();
+                for (NameValuePair header : headers)
                 {
-                    contentType = header.getValue();
+                    final String name = header.getName();
+                    if (name.toLowerCase(Locale.ENGLISH).equals(
+                            HttpHeaders.CONTENT_TYPE
+                                    .toLowerCase(Locale.ENGLISH)))
+                    {
+                        contentType = header.getValue();
+                    }
                 }
-            }
-            if (contentType != null && contentType.length() > 0)
-            {
-                metadata.add(HttpHeaders.CONTENT_TYPE, contentType);
-            }
-            final Reader reader = tika.parse(page.getWebResponse()
-                    .getContentAsStream(), metadata);
-            response.setTextReader(reader);
+                if (contentType != null && contentType.length() > 0)
+                {
+                    metadata.add(HttpHeaders.CONTENT_TYPE, contentType);
+                }
+                final Reader reader = tika.parse(page.getWebResponse()
+                        .getContentAsStream(), metadata);
 
-            response.setConversionTime(new Date().getTime() - convertStart);
+                response.setTextReader(reader);
+                response.setConversionTime(new Date().getTime() - convertStart);
 
-            if (this.includeMetadata)
-            {
-                // response.setConversionMetadata(metadata);
-                addMetadataToResponse(metadata, response);
+                if (this.includeMetadata)
+                {
+                    addMetadataToResponse(metadata, response);
+                }
             }
         }
         catch (IOException e)
         {
             throw new Url2TextException(
-                    "Failed to convert text (content encrypted)?", e);
+                    "Failed to convert text (content encrypted possibly encrypted)",
+                    e);
         }
     }
 
     @Override
-    public Url2Text clone() 
+    public Url2Text clone()
     {
         try
         {
@@ -1076,5 +1086,4 @@ public class Url2Text implements Cloneable
         }
     }
 
-    
 }

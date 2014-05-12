@@ -490,7 +490,8 @@ public class Response implements Closeable, AutoCloseable
     {
         if (contentLength == null || contentLength.length() == 0)
         {
-            this.setContentLength(0L);
+            // most likley a Transfer-Encoding chunked file
+            this.setContentLength(LONG_NOT_SET);
         }
         else
         {
