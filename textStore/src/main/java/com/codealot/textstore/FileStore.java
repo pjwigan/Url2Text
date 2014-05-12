@@ -3,6 +3,7 @@ package com.codealot.textstore;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
+import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -50,7 +51,8 @@ import org.apache.commons.io.input.ReaderInputStream;
  *         implied. See the License for the specific language governing
  *         permissions and limitations under the License.
  */
-public class FileStore implements TextStore
+@SuppressWarnings("serial")
+public class FileStore implements TextStore, Serializable
 {
     // FUTURE add a getTextUrl(baseUrl) method to serve as static object
     
@@ -88,6 +90,10 @@ public class FileStore implements TextStore
     public String storeText(final String text) throws IOException
     {
         Objects.requireNonNull(text, "No text provided");
+        if (text.equals(""))
+        {
+            return this.storeText(NO_CONTENT);
+        }
 
         // make the digester
         final MessageDigest digester = getDigester();
@@ -201,7 +207,7 @@ public class FileStore implements TextStore
             // check that something was read
             if (totalRead == 0L) 
             {
-                throw new IOException("reader had no content");
+                return this.storeText("");
             }
             // make the hash
             final String hash = byteToHex(digester.digest());

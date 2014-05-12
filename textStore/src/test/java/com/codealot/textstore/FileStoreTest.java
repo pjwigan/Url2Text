@@ -214,6 +214,14 @@ public class FileStoreTest
         assertEquals(text, fileStore.getText(id));
     }
 
+    @Test
+    public void testStoreTextEmpty() throws IOException
+    {
+        String text = "";
+        String id = fileStore.storeText(text);
+        assertEquals(TextStore.NO_CONTENT, fileStore.getText(id));
+    }
+
     @Test(expected = NullPointerException.class)
     public void testDeleteTextNullId() throws IOException
     {

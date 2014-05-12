@@ -29,6 +29,10 @@ public interface TextStore
 {
     
     // FUTURE store charset
+    // FUTURE store language
+    // FUTURE make NO_CONTENT localisable
+    
+    public static final String NO_CONTENT = "no content";
 
     /**
      * Fetch the text represented by an id.

@@ -4,6 +4,7 @@ import static com.codealot.url2text.Constants.*;
 
 import java.io.IOException;
 import java.io.Reader;
+import java.io.Serializable;
 import java.io.StringReader;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -29,6 +30,7 @@ import com.gargoylesoftware.htmlunit.BrowserVersion;
 import com.gargoylesoftware.htmlunit.CookieManager;
 import com.gargoylesoftware.htmlunit.FailingHttpStatusCodeException;
 import com.gargoylesoftware.htmlunit.HttpMethod;
+import com.gargoylesoftware.htmlunit.IncorrectnessListener;
 import com.gargoylesoftware.htmlunit.JavaScriptPage;
 import com.gargoylesoftware.htmlunit.Page;
 import com.gargoylesoftware.htmlunit.TextPage;
@@ -103,7 +105,8 @@ import com.gargoylesoftware.htmlunit.xml.XmlPage;
  *         implied. See the License for the specific language governing
  *         permissions and limitations under the License.
  */
-public class Url2Text implements Cloneable
+@SuppressWarnings("serial")
+public class Url2Text implements Cloneable, Serializable
 {
     // FUTURE suppress 'enable javascript' and 'enable cookies' messages when
     // those options have been specified (but might be an HtmlUnit bug)
@@ -115,6 +118,9 @@ public class Url2Text implements Cloneable
     // FUTURE add credential support
 
     // FUTURE better error reporting when failing on encrypted documents
+    
+    // FUTURE when javascript enabled, set HtmlUnit WebClient AlertHandler, ConfirmHandler, PromptHandler
+
 
     // SLF4J logger instance
     private static final Logger LOG = LoggerFactory.getLogger(Url2Text.class);
@@ -945,6 +951,9 @@ public class Url2Text implements Cloneable
         }
         final WebClientOptions options = client.getOptions();
         client.setJavaScriptErrorListener(null);
+        client.setIncorrectnessListener(new NoOpIncorrectnessListener()); 
+        
+        // FUTURE when js enabled, set AlertHandler, ConfirmHandler, PromptHandler
 
         // configure web client
         options.setActiveXNative(this.activeXNative);
@@ -975,7 +984,6 @@ public class Url2Text implements Cloneable
                 cookieManager.clearExpired(new Date());
             }
         }
-
         return client;
     }
 
@@ -1086,4 +1094,19 @@ public class Url2Text implements Cloneable
         }
     }
 
+    /**
+     * Class to avoid excess log messages.
+     * 
+     * @author jacobsp
+     *
+     */
+    class NoOpIncorrectnessListener implements IncorrectnessListener
+    {
+        @Override
+        public void notify(String message, Object origin)
+        {
+            // do nothing
+        }
+        
+    }
 }
