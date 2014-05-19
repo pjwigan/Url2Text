@@ -3,7 +3,6 @@ package com.codealot.textstore;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
-import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -51,11 +50,8 @@ import org.apache.commons.io.input.ReaderInputStream;
  *         implied. See the License for the specific language governing
  *         permissions and limitations under the License.
  */
-@SuppressWarnings("serial")
-public class FileStore implements TextStore, Serializable
+public class FileStore implements TextStore
 {
-    // FUTURE add a getTextUrl(baseUrl) method to serve as static object
-    
     // path to the root of the file store. Must be a directory.
     private final String storeRoot;
 
@@ -214,15 +210,15 @@ public class FileStore implements TextStore, Serializable
 
             // store the text, if new
             final Path finalPath = Paths.get(this.storeRoot, hash);
-            if (!Files.exists(finalPath))
-            {
-                // rename the file
-                Files.move(textPath, finalPath);
-            }
-            else
+            if (Files.exists(finalPath))
             {
                 // already existed, so delete uuid named one
                 Files.deleteIfExists(textPath);
+            }
+            else
+            {
+                // rename the file
+                Files.move(textPath, finalPath);               
             }
             return hash;
         }
@@ -236,7 +232,7 @@ public class FileStore implements TextStore, Serializable
     }
 
     @Override
-    public Reader getTextReader(String id) throws IOException
+    public Reader getTextReader(final String id) throws IOException
     {
         checkId(id);
         final Path textPath = idToPath(id);
@@ -244,7 +240,7 @@ public class FileStore implements TextStore, Serializable
     }
 
     @Override
-    public long getLength(String id) throws IOException
+    public long getLength(final String id) throws IOException
     {
         checkId(id);
         final Path textPath = idToPath(id);
@@ -252,11 +248,11 @@ public class FileStore implements TextStore, Serializable
     }
 
     @Override
-    public Date getStoreDate(String id) throws IOException
+    public Date getStoreDate(final String id) throws IOException
     {
         checkId(id);
         final Path textPath = idToPath(id);
-        FileTime time = Files.getLastModifiedTime(textPath);
+        final FileTime time = Files.getLastModifiedTime(textPath);
         return new Date(time.toMillis());
     }
 

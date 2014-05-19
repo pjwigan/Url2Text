@@ -105,4 +105,5 @@ public interface TextStore
      * @throws IOException
      */
     public boolean deleteText(String id) throws IOException;
+    
 }
