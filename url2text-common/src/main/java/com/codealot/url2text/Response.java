@@ -61,6 +61,7 @@ public class Response implements Closeable, AutoCloseable
     private String etag = STR_NOT_SET;
     private String lastModified = STR_NOT_SET;
     private long conversionTime = 0L;
+    // TODO add a checked Date field
 
     // optional content
     private List<NameAndValue> responseHeaders = new ArrayList<>();

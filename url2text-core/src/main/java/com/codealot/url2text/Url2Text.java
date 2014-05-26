@@ -841,6 +841,7 @@ public class Url2Text implements Cloneable, Serializable
     private Response buildResponse(final URL requestUrl, final Page page,
             final boolean includeHeaders)
     {
+        // TODO add a param for checked Date
         final Response response = new Response();
 
         // capture the request URL

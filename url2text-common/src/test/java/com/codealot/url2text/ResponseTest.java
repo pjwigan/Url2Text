@@ -18,7 +18,6 @@ public class ResponseTest
 {
 
     private final ObjectMapper mapper = new ObjectMapper();
-    // private final Response response = new Response();
     private final List<NameAndValue> namesAndValues = new ArrayList<>();
 
     @Before
