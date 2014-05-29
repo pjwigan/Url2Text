@@ -38,7 +38,8 @@ public class Url2TextFetchTextTest
     {
         final ProcessBuilder process = new ProcessBuilder("python", "-m",
                 "SimpleHTTPServer", "8000");
-        process.directory(new File("src/test/resources"));
+        // TODO find a better way of doing this
+        //process.directory(new File("/home/jacobsp/git/url2text/url2text-core/src/test/resources"));
         httpServer = process.start();
         // give it a moment to fire up
         Thread.sleep(1500);

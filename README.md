@@ -64,8 +64,11 @@ Several of the header fields are reproduced here for convenience.
 
 *   **Status-Message:**
     The HTTP message that accompanied the status code.
+    
+*   **Fetch-Date:**
+    The date the fetch was performed, in ISO8601 format.
 
-*   **Fetch-Time:**
+*   **Fetch-Duration:**
     The number of milliseconds it took to fetch the content from the server.
 
 *   **Content-Type:**
@@ -86,7 +89,7 @@ Several of the header fields are reproduced here for convenience.
 *   **Last-Modified:**
     Reported Last-Modified, if any, of the fetched content.
     
-*   **Conversion-Time:**
+*   **Conversion-Duration:**
     The number of milliseconds it took Tika to process the content.
 
 ### Content Metadata
@@ -101,17 +104,18 @@ Output Formats
 Intended for human consumption.  For example (with headers and metadata included):
 
     ################ TRANSACTION METADATA ################
-    Request page  : http://example.com
-    Landing page  : http://example.com/
-    Status        : 200 OK
-    Fetch time    : 281 ms
-    Content type  : text/html
-    Content char  : UTF-8
-    Content length: 1270
-    Etag          : "359670651"
-    Last Modified : Fri, 09 Aug 2013 23:54:35 GMT
-    Convert time  : 351 ms
-
+    Request page     : http://example.com
+    Landing page     : http://example.com/
+    Status           : 200 OK
+    Fetch date       : 2014-05-29T20:28:27+01:00
+    Fetch duration   : 281 ms
+    Content type     : text/html
+    Content char     : UTF-8
+    Content length   : 1270
+    Etag             : "359670651"
+    Last Modified    : Fri, 09 Aug 2013 23:54:35 GMT
+    Convert duration : 351 ms
+ 
     ################ RESPONSE HEADERS ####################
     Accept-Ranges = bytes
     Cache-Control = max-age=604800
@@ -149,13 +153,14 @@ Intended for machine reading.  The following example has been pretty-printed for
         "Landing-Page":"http://example.com/",
         "Status":200,
         "Status-Message":"OK",
-        "Fetch-Time":274,
+        "Fetch-Date":"2014-05-29T20:28:27+01:00",
+        "Fetch-Duration":274,
         "Content-Type":"text/html",
         "Content-Charset":"UTF-8",
         "Content-Length":1270,
         "ETag":"\"359670651\"",
         "Last-Modified":"Fri, 09 Aug 2013 23:54:35 GMT",
-        "Conversion-Time":353},
+        "Conversion-Duration":353},
      "Response-Headers":{
         "Accept-Ranges":"bytes",
         "Cache-Control":"max-age=604800",

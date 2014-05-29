@@ -7,11 +7,16 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
+import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 
+import org.apache.commons.lang3.time.DateFormatUtils;
+
+import com.codealot.url2text.Constants.OutputFormat;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerationException;
 import com.fasterxml.jackson.core.JsonGenerator;
@@ -54,14 +59,14 @@ public class Response implements Closeable, AutoCloseable
     private String landingPage = STR_NOT_SET;
     private int status = INT_NOT_SET;
     private String statusMessage = STR_NOT_SET;
-    private long fetchTime = LONG_NOT_SET;
+    private Date fetchDate = new Date();
+    private long fetchDuration = LONG_NOT_SET;
     private String contentType = STR_NOT_SET;
     private String contentCharset = STR_NOT_SET;
     private long contentLength = LONG_NOT_SET;
     private String etag = STR_NOT_SET;
     private String lastModified = STR_NOT_SET;
-    private long conversionTime = 0L;
-    // TODO add a checked Date field
+    private long conversionDuration = 0L;
 
     // optional content
     private List<NameAndValue> responseHeaders = new ArrayList<>();
@@ -87,9 +92,10 @@ public class Response implements Closeable, AutoCloseable
      * @param json
      * @throws IOException
      * @throws JsonProcessingException
+     * @throws ParseException 
      */
     public Response(final String json) throws JsonProcessingException,
-            IOException
+            IOException, ParseException
     {
         final ObjectMapper mapper = new ObjectMapper();
         final JsonNode rootNode = mapper.readTree(json);
@@ -100,14 +106,15 @@ public class Response implements Closeable, AutoCloseable
         this.status = transactionNode.get(HDR_STATUS).asInt();
         this.statusMessage = transactionNode.get(HDR_STATUS_MESSAGE)
                 .textValue();
-        this.fetchTime = transactionNode.get(HDR_FETCH_TIME).asLong();
+        this.fetchDate = DateFormatUtils.ISO_DATETIME_TIME_ZONE_FORMAT.parse(transactionNode.get(HDR_FETCH_DATE).textValue());
+        this.fetchDuration = transactionNode.get(HDR_FETCH_DURATION).asLong();
         this.contentType = transactionNode.get(HDR_CONTENT_TYPE).textValue();
         this.contentCharset = transactionNode.get(HDR_CONTENT_CHARSET)
                 .textValue();
         this.contentLength = transactionNode.get(HDR_CONTENT_LENGTH).asLong();
         this.etag = transactionNode.get(HDR_ETAG).textValue();
         this.lastModified = transactionNode.get(HDR_LAST_MODIFIED).textValue();
-        this.conversionTime = transactionNode.get(HDR_CONVERSION_TIME).asLong();
+        this.conversionDuration = transactionNode.get(HDR_CONVERSION_DURATION).asLong();
 
         final JsonNode headersNode = rootNode.get(HDR_RESPONSE_HEADERS);
         for (final Iterator<String> i = headersNode.fieldNames(); i.hasNext();)
@@ -179,8 +186,8 @@ public class Response implements Closeable, AutoCloseable
         {
             throw new RuntimeException(e);
         }
-        return Objects.hash(this.status, this.statusMessage, this.fetchTime,
-                this.contentLength, this.conversionTime, this.requestPage,
+        return Objects.hash(this.status, this.statusMessage, this.fetchDate, this.fetchDuration,
+                this.contentLength, this.conversionDuration, this.requestPage,
                 this.landingPage, this.contentType, this.contentCharset,
                 this.etag, this.lastModified, this.responseHeaders,
                 this.contentMetadata, this.text);
@@ -218,6 +225,8 @@ public class Response implements Closeable, AutoCloseable
      */
     public String toJson() throws Url2TextException
     {
+        
+        
         final JsonFactory jFactory = new JsonFactory();
         final ByteArrayOutputStream destination = new ByteArrayOutputStream();
 
@@ -235,7 +244,8 @@ public class Response implements Closeable, AutoCloseable
             jsonGenerator.writeNumberField(HDR_STATUS, this.status);
             jsonGenerator.writeStringField(HDR_STATUS_MESSAGE,
                     this.statusMessage);
-            jsonGenerator.writeNumberField(HDR_FETCH_TIME, this.fetchTime);
+            jsonGenerator.writeStringField(HDR_FETCH_DATE, DateFormatUtils.ISO_DATETIME_TIME_ZONE_FORMAT.format(this.fetchDate));
+            jsonGenerator.writeNumberField(HDR_FETCH_DURATION, this.fetchDuration);
             jsonGenerator.writeStringField(HDR_CONTENT_TYPE, this.contentType);
             jsonGenerator.writeStringField(HDR_CONTENT_CHARSET,
                     this.contentCharset);
@@ -244,8 +254,8 @@ public class Response implements Closeable, AutoCloseable
             jsonGenerator.writeStringField(HDR_ETAG, this.etag);
             jsonGenerator
                     .writeStringField(HDR_LAST_MODIFIED, this.lastModified);
-            jsonGenerator.writeNumberField(HDR_CONVERSION_TIME,
-                    this.conversionTime);
+            jsonGenerator.writeNumberField(HDR_CONVERSION_DURATION,
+                    this.conversionDuration);
 
             jsonGenerator.writeEndObject();
 
@@ -313,18 +323,19 @@ public class Response implements Closeable, AutoCloseable
         final StringBuilder buffer = new StringBuilder(350);
 
         buffer.append("################ TRANSACTION METADATA ################");
-        buffer.append("\nRequest page   : ").append(this.requestPage);
-        buffer.append("\nLanding page   : ").append(this.landingPage);
-        buffer.append("\nStatus         : ").append(this.status).append(' ')
+        buffer.append("\nRequest page     : ").append(this.requestPage);
+        buffer.append("\nLanding page     : ").append(this.landingPage);
+        buffer.append("\nStatus           : ").append(this.status).append(' ')
                 .append(this.statusMessage);
-        buffer.append("\nFetch time     : ").append(this.fetchTime)
+        buffer.append("\nFetch date       : ").append(DateFormatUtils.ISO_DATETIME_TIME_ZONE_FORMAT.format(this.fetchDate));
+        buffer.append("\nFetch duration   : ").append(this.fetchDuration)
                 .append(" ms");
-        buffer.append("\nContent type   : ").append(this.contentType);
-        buffer.append("\nContent charset: ").append(this.contentCharset);
-        buffer.append("\nContent length : ").append(this.contentLength);
-        buffer.append("\nEtag           : ").append(this.etag);
-        buffer.append("\nLast Modified  : ").append(this.lastModified);
-        buffer.append("\nConvert time   : ").append(this.conversionTime)
+        buffer.append("\nContent type     : ").append(this.contentType);
+        buffer.append("\nContent charset  : ").append(this.contentCharset);
+        buffer.append("\nContent length   : ").append(this.contentLength);
+        buffer.append("\nEtag             : ").append(this.etag);
+        buffer.append("\nLast Modified    : ").append(this.lastModified);
+        buffer.append("\nConvert duration : ").append(this.conversionDuration)
                 .append(" ms\n\n");
 
         if (!responseHeaders.isEmpty())
@@ -402,19 +413,29 @@ public class Response implements Closeable, AutoCloseable
     {
         this.statusMessage = (statusMessage == null) ? "" : statusMessage;
     }
-
-    public long getFetchTime()
+    
+    public Date getFetchDate()
     {
-        return this.fetchTime;
+        return this.fetchDate;
+    }
+    
+    public void setFetchDate(Date date)
+    {
+        this.fetchDate = date;
     }
 
-    public void setFetchTime(final long fetchTime)
+    public long getFetchDuration()
+    {
+        return this.fetchDuration;
+    }
+
+    public void setFetchDuration(final long fetchTime)
     {
         if (fetchTime < 0L)
         {
             throw new IllegalArgumentException("Fetch time cannot be negative.");
         }
-        this.fetchTime = fetchTime;
+        this.fetchDuration = fetchTime;
     }
 
     public String getContentType()
@@ -437,19 +458,19 @@ public class Response implements Closeable, AutoCloseable
         this.contentCharset = (contentCharset == null) ? "" : contentCharset;
     }
 
-    public long getConversionTime()
+    public long getConversionDuration()
     {
-        return this.conversionTime;
+        return this.conversionDuration;
     }
 
-    public void setConversionTime(final long conversionTime)
+    public void setConversionDuration(final long conversionTime)
     {
         if (conversionTime < 0L)
         {
             throw new IllegalArgumentException(
                     "Conversion time cannot be negative.");
         }
-        this.conversionTime = conversionTime;
+        this.conversionDuration = conversionTime;
     }
 
     public String getEtag()

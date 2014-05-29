@@ -37,10 +37,11 @@ public class Constants
     public static final String HDR_CONTENT_LENGTH = "Content-Length";
     public static final String HDR_CONTENT_METADATA = "Content-Metadata";
     public static final String HDR_CONTENT_TYPE = "Content-Type";
-    public static final String HDR_CONVERSION_TIME = "Conversion-Time";
+    public static final String HDR_CONVERSION_DURATION = "Conversion-Duration";
     public static final String HDR_CONVERTED_TEXT = "Converted-Text";
     public static final String HDR_ETAG = "ETag";
-    public static final String HDR_FETCH_TIME = "Fetch-Time";
+    public static final String HDR_FETCH_DATE = "Fetch-Date";
+    public static final String HDR_FETCH_DURATION = "Fetch-Duration";
     public static final String HDR_IF_MODIFIED_SINCE = "If-Modified-Since";
     public static final String HDR_IF_NONE_MATCH = "If-None-Match";
     public static final String HDR_LANDING_PAGE = "Landing-Page";

@@ -6,6 +6,7 @@ import static org.junit.Assert.*;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.junit.Before;
@@ -50,7 +51,7 @@ public class ResponseTest
             response.setResponseHeaders(namesAndValues);
             
             String jsonString = response.toJson();
-
+            
             final JsonNode root = mapper.readTree(jsonString);
 
             // top level objects
@@ -64,13 +65,14 @@ public class ResponseTest
             assertTrue(tm.has(HDR_LANDING_PAGE));
             assertTrue(tm.has(HDR_STATUS));
             assertTrue(tm.has(HDR_STATUS_MESSAGE));
-            assertTrue(tm.has(HDR_FETCH_TIME));
+            assertTrue(tm.has(HDR_FETCH_DATE));
+            assertTrue(tm.has(HDR_FETCH_DURATION));
             assertTrue(tm.has(HDR_CONTENT_TYPE));
             assertTrue(tm.has(HDR_CONTENT_CHARSET));
             assertTrue(tm.has(HDR_CONTENT_LENGTH));
             assertTrue(tm.has(HDR_ETAG));
             assertTrue(tm.has(HDR_LAST_MODIFIED));
-            assertTrue(tm.has(HDR_CONVERSION_TIME));
+            assertTrue(tm.has(HDR_CONVERSION_DURATION));
 
             final JsonNode rh = root.get(HDR_RESPONSE_HEADERS);
             assertTrue(rh.has("key1"));
@@ -88,10 +90,11 @@ public class ResponseTest
             response.setContentCharset("charset");
             response.setContentLength(1000);
             response.setContentType("type");
-            response.setConversionTime(100);
+            response.setConversionDuration(100);
             response.setTextReader(new StringReader("text"));
             response.setEtag("etag");
-            response.setFetchTime(100);
+            response.setFetchDate(new Date(0));
+            response.setFetchDuration(100);
             response.setLandingPage("landing page");
             response.setLastModified("last modified");
             response.setRequestPage("request page");
@@ -149,12 +152,13 @@ public class ResponseTest
             assertTrue(string.contains("Request page"));
             assertTrue(string.contains("Landing page"));
             assertTrue(string.contains("Status"));
-            assertTrue(string.contains("Fetch time"));
+            assertTrue(string.contains("Fetch date"));
+            assertTrue(string.contains("Fetch duration"));
             assertTrue(string.contains("Content type"));
             assertTrue(string.contains("Content charset"));
             assertTrue(string.contains("Content length"));
             assertTrue(string.contains("Etag"));
-            assertTrue(string.contains("Convert time"));
+            assertTrue(string.contains("Convert duration"));
             assertTrue(string.contains("key1"));
         }
     }
@@ -226,7 +230,7 @@ public class ResponseTest
     {
         try (final Response response = new Response())
         {
-            response.setFetchTime(-1);
+            response.setFetchDuration(-1);
         }
     }
 
@@ -236,11 +240,11 @@ public class ResponseTest
         try (final Response response = new Response())
         {
             // check initially LONG_NOT_SET, then 0, then number
-            assertEquals(LONG_NOT_SET, response.getFetchTime());
-            response.setFetchTime(0);
-            assertEquals(0, response.getFetchTime());
-            response.setFetchTime(1000);
-            assertEquals(1000, response.getFetchTime());
+            assertEquals(LONG_NOT_SET, response.getFetchDuration());
+            response.setFetchDuration(0);
+            assertEquals(0, response.getFetchDuration());
+            response.setFetchDuration(1000);
+            assertEquals(1000, response.getFetchDuration());
         }
     }
 
@@ -282,9 +286,9 @@ public class ResponseTest
         try (final Response response = new Response())
         {
             // check initially 0L, then number
-            assertEquals(0L, response.getConversionTime());
-            response.setConversionTime(1000);
-            assertEquals(1000, response.getConversionTime());
+            assertEquals(0L, response.getConversionDuration());
+            response.setConversionDuration(1000);
+            assertEquals(1000, response.getConversionDuration());
         }
     }
 
@@ -293,7 +297,7 @@ public class ResponseTest
     {
         try (final Response response = new Response())
         {
-            response.setConversionTime(-1);
+            response.setConversionDuration(-1);
         }
     }
 

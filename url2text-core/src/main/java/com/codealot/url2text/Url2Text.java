@@ -110,6 +110,10 @@ public class Url2Text implements Cloneable, Serializable
 {
     // FUTURE suppress 'enable javascript' and 'enable cookies' messages when
     // those options have been specified (but might be an HtmlUnit bug)
+    
+    // FUTURE add fetch-date field
+    // FUTURE change fetch-time to fetch-duration
+    // FUTURE change conversion-time to conversion-duration
 
     // FUTURE timeout for text conversion
 
@@ -185,7 +189,7 @@ public class Url2Text implements Cloneable, Serializable
      * Constructor that accepts a Properties instance to configure the defaults.
      * <p>
      * Only settings that vary from the defaults need to be present. Can be null
-     * or empty
+     * or empty.
      * 
      * @param properties
      *            can be null or empty
@@ -452,6 +456,7 @@ public class Url2Text implements Cloneable, Serializable
 
         // fetch page
         LOG.debug("Fetching page {}", requestUrl.toExternalForm());
+        final Date fetchDate = new Date();
         Page page = null;
         try
         {
@@ -463,7 +468,7 @@ public class Url2Text implements Cloneable, Serializable
         }
 
         // grab metadata from the fetch transaction
-        final Response response = buildResponse(requestUrl, page,
+        final Response response = buildResponse(requestUrl, fetchDate, page,
                 this.includeHeaders);
 
         // check content length, if present in response
@@ -838,7 +843,7 @@ public class Url2Text implements Cloneable, Serializable
      * @param includeHeaders
      * @return populated response
      */
-    private Response buildResponse(final URL requestUrl, final Page page,
+    private Response buildResponse(final URL requestUrl, final Date fetchDate, final Page page,
             final boolean includeHeaders)
     {
         // TODO add a param for checked Date
@@ -855,7 +860,8 @@ public class Url2Text implements Cloneable, Serializable
 
         response.setStatus(webResponse.getStatusCode());
         response.setStatusMessage(webResponse.getStatusMessage());
-        response.setFetchTime(webResponse.getLoadTime());
+        response.setFetchDate(fetchDate);
+        response.setFetchDuration(webResponse.getLoadTime());
         response.setContentType(webResponse.getContentType());
         response.setContentCharset(webResponse.getContentCharset());
         response.setEtag(webResponse.getResponseHeaderValue(HDR_ETAG));
@@ -1066,7 +1072,7 @@ public class Url2Text implements Cloneable, Serializable
                         .getContentAsStream(), metadata);
 
                 response.setTextReader(reader);
-                response.setConversionTime(new Date().getTime() - convertStart);
+                response.setConversionDuration(new Date().getTime() - convertStart);
 
                 if (this.includeMetadata)
                 {
