@@ -1,12 +1,20 @@
 package com.codealot.url2text;
 
-import static com.codealot.url2text.Constants.*;
+import static com.codealot.url2text.Constants.HDR_CONTENT_METADATA;
+import static com.codealot.url2text.Constants.HDR_IF_MODIFIED_SINCE;
+import static com.codealot.url2text.Constants.HDR_IF_NONE_MATCH;
+import static com.codealot.url2text.Constants.HDR_RESPONSE_HEADERS;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.InetSocketAddress;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashMap;
 
 import org.junit.AfterClass;
@@ -15,14 +23,19 @@ import org.junit.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sun.net.httpserver.Headers;
+import com.sun.net.httpserver.HttpExchange;
+import com.sun.net.httpserver.HttpHandler;
+import com.sun.net.httpserver.HttpServer;
 
+@SuppressWarnings("restriction")
 public class Url2TextFetchTextTest
 {
 
     private static final String LOCAL_HOST = "http://localhost:8000/";
     private static final String REMOTE_HOST = "http://example.com";
 
-    private static Process httpServer;
+    private static HttpServer server;
 
     private final ObjectMapper mapper;
     private final Url2Text fetcher;
@@ -32,25 +45,55 @@ public class Url2TextFetchTextTest
         mapper = new ObjectMapper();
         fetcher = new Url2Text();
     }
+    
+    static class FileHandler implements HttpHandler
+    {
+        String contentType;
+        Path filePath;
+        
+        FileHandler(String filename, String mimeType)
+        {
+            contentType = mimeType;
+            filePath = Paths.get("src/test/resources/" + filename);
+        }
+        
+        @Override
+        public void handle(HttpExchange exchange) throws IOException
+        {
+            InputStream is = exchange.getRequestBody();
+            while(is.read() > -1);
+            Headers responseHeaders = exchange.getResponseHeaders();
+            responseHeaders.add("Content-Type", contentType);
+            byte[] response = Files.readAllBytes(filePath);
+            exchange.sendResponseHeaders(200, response.length);
+            OutputStream os = exchange.getResponseBody();
+            os.write(response);
+            exchange.close();
+        }
+    }
 
     @BeforeClass
     public static void setUpBeforeClass() throws Exception
     {
-        final ProcessBuilder process = new ProcessBuilder("python", "-m",
-                "SimpleHTTPServer", "8000");
-        // TODO find a better way of doing this
-        //process.directory(new File("/home/jacobsp/git/url2text/url2text-core/src/test/resources"));
-        httpServer = process.start();
+        server = HttpServer.create(new InetSocketAddress(8000), 0);
+        server.createContext("/plain-text.txt", new FileHandler("plain-text.txt", "text/plain"));
+        server.createContext("/html-4-JS.html", new FileHandler("html-4-JS.html", "text/html"));
+        server.createContext("/example.wsdl", new FileHandler("example.wsdl", "application/wsdl+xml"));
+        server.createContext("/encrypted.odt", new FileHandler("encrypted.odt", "application/vnd.oasis.opendocument.text "));
+        server.createContext("/empty.doc", new FileHandler("empty.doc", "text/plain "));    // kludge to avoid Tika being invoked
+        server.createContext("/docbook5.xml", new FileHandler("docbook5.xml", "application/xml"));
+        server.createContext("/docbook.xml", new FileHandler("docbook.xml", "application/xml"));
+        server.createContext("/binary.odt", new FileHandler("binary.odt", "application/vnd.oasis.opendocument.text "));
+        server.setExecutor(null);
+        server.start();
         // give it a moment to fire up
-        Thread.sleep(1500);
+        Thread.sleep(500);
     }
 
     @AfterClass
     public static void tearDownAfterClass() throws Exception
     {
-        httpServer.destroy();
-        // wait for stop
-        Thread.sleep(1200);
+        server.stop(0);
     }
 
     @Test

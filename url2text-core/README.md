@@ -18,8 +18,6 @@ Java 7 or later is required.
 
 The cloned code can either be built using `mvn package` or imported into Eclipse (Kepler J2EE edition is the development environment).
 
-For testing only, it is necessary for `python` to be on the path.
-
 
 Usage
 -----
