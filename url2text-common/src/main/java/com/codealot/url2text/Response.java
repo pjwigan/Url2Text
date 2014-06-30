@@ -61,6 +61,7 @@ public class Response implements Closeable, AutoCloseable
     private String statusMessage = STR_NOT_SET;
     private Date fetchDate = new Date();
     private long fetchDuration = LONG_NOT_SET;
+    private String contentTitle = STR_NOT_SET;
     private String contentType = STR_NOT_SET;
     private String contentCharset = STR_NOT_SET;
     private long contentLength = LONG_NOT_SET;
@@ -106,7 +107,8 @@ public class Response implements Closeable, AutoCloseable
         this.status = transactionNode.get(HDR_STATUS).asInt();
         this.statusMessage = transactionNode.get(HDR_STATUS_MESSAGE)
                 .textValue();
-        this.fetchDate = DateFormatUtils.ISO_DATETIME_TIME_ZONE_FORMAT.parse(transactionNode.get(HDR_FETCH_DATE).textValue());
+        this.fetchDate = DateFormatUtils.ISO_DATETIME_TIME_ZONE_FORMAT
+                .parse(transactionNode.get(HDR_FETCH_DATE).textValue());
         this.fetchDuration = transactionNode.get(HDR_FETCH_DURATION).asLong();
         this.contentType = transactionNode.get(HDR_CONTENT_TYPE).textValue();
         this.contentCharset = transactionNode.get(HDR_CONTENT_CHARSET)
@@ -114,7 +116,8 @@ public class Response implements Closeable, AutoCloseable
         this.contentLength = transactionNode.get(HDR_CONTENT_LENGTH).asLong();
         this.etag = transactionNode.get(HDR_ETAG).textValue();
         this.lastModified = transactionNode.get(HDR_LAST_MODIFIED).textValue();
-        this.conversionDuration = transactionNode.get(HDR_CONVERSION_DURATION).asLong();
+        this.conversionDuration = transactionNode.get(HDR_CONVERSION_DURATION)
+                .asLong();
 
         final JsonNode headersNode = rootNode.get(HDR_RESPONSE_HEADERS);
         for (final Iterator<String> i = headersNode.fieldNames(); i.hasNext();)
@@ -186,7 +189,8 @@ public class Response implements Closeable, AutoCloseable
         {
             throw new RuntimeException(e);
         }
-        return Objects.hash(this.status, this.statusMessage, this.fetchDate, this.fetchDuration,
+        return Objects.hash(this.status, this.statusMessage, this.fetchDate, 
+                this.fetchDuration,
                 this.contentLength, this.conversionDuration, this.requestPage,
                 this.landingPage, this.contentType, this.contentCharset,
                 this.etag, this.lastModified, this.responseHeaders,
@@ -244,7 +248,9 @@ public class Response implements Closeable, AutoCloseable
             jsonGenerator.writeNumberField(HDR_STATUS, this.status);
             jsonGenerator.writeStringField(HDR_STATUS_MESSAGE,
                     this.statusMessage);
-            jsonGenerator.writeStringField(HDR_FETCH_DATE, DateFormatUtils.ISO_DATETIME_TIME_ZONE_FORMAT.format(this.fetchDate));
+            jsonGenerator.writeStringField(HDR_FETCH_DATE, 
+                    DateFormatUtils.ISO_DATETIME_TIME_ZONE_FORMAT
+                    .format(this.fetchDate));
             jsonGenerator.writeNumberField(HDR_FETCH_DURATION, this.fetchDuration);
             jsonGenerator.writeStringField(HDR_CONTENT_TYPE, this.contentType);
             jsonGenerator.writeStringField(HDR_CONTENT_CHARSET,
@@ -327,7 +333,8 @@ public class Response implements Closeable, AutoCloseable
         buffer.append("\nLanding page     : ").append(this.landingPage);
         buffer.append("\nStatus           : ").append(this.status).append(' ')
                 .append(this.statusMessage);
-        buffer.append("\nFetch date       : ").append(DateFormatUtils.ISO_DATETIME_TIME_ZONE_FORMAT.format(this.fetchDate));
+        buffer.append("\nFetch date       : ").append(DateFormatUtils
+                .ISO_DATETIME_TIME_ZONE_FORMAT.format(this.fetchDate));
         buffer.append("\nFetch duration   : ").append(this.fetchDuration)
                 .append(" ms");
         buffer.append("\nContent type     : ").append(this.contentType);
@@ -611,4 +618,14 @@ public class Response implements Closeable, AutoCloseable
         }
     }
 
+    public String getContentTitle()
+    {
+        return this.contentTitle;
+    }
+
+    public void setContentTitle(String contentTitle)
+    {
+        this.contentTitle = contentTitle == null ? "" : contentTitle;
+    }
+    
 }

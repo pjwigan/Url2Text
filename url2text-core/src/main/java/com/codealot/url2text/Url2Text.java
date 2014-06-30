@@ -111,15 +111,15 @@ public class Url2Text implements Cloneable, Serializable
     // FUTURE suppress 'enable javascript' and 'enable cookies' messages when
     // those options have been specified (but might be an HtmlUnit bug)
     
-    // FUTURE add fetch-date field
-    // FUTURE change fetch-time to fetch-duration
-    // FUTURE change conversion-time to conversion-duration
-
     // FUTURE timeout for text conversion
+    
+    // FUTURE add title field (html, plus others when metadata obtained from Tika)
 
     // FUTURE add http proxy support
 
     // FUTURE add credential support
+    
+    // FUTURE add option to capture links, images, and media as well as text
 
     // FUTURE better error reporting when failing on encrypted documents
     
@@ -495,6 +495,7 @@ public class Url2Text implements Cloneable, Serializable
         {
             // use HtmlUnit's DOM for JavaScript execution artifacts
             final HtmlPage source = (HtmlPage) page;
+            response.setContentTitle(source.getTitleText());
             response.setTextReader(new StringReader(source.asText()));
         }
         else if (page instanceof TextPage)
@@ -832,6 +833,7 @@ public class Url2Text implements Cloneable, Serializable
                 localHeaders.add(new NameAndValue(header, value));
             }
         }
+        // TODO response.setContentText(???); e.g. dc:title value
         response.setContentMetadata(localHeaders);
     }
 
@@ -846,7 +848,6 @@ public class Url2Text implements Cloneable, Serializable
     private Response buildResponse(final URL requestUrl, final Date fetchDate, final Page page,
             final boolean includeHeaders)
     {
-        // TODO add a param for checked Date
         final Response response = new Response();
 
         // capture the request URL
@@ -1072,12 +1073,14 @@ public class Url2Text implements Cloneable, Serializable
                         .getContentAsStream(), metadata);
 
                 response.setTextReader(reader);
-                response.setConversionDuration(new Date().getTime() - convertStart);
 
                 if (this.includeMetadata)
                 {
                     addMetadataToResponse(metadata, response);
                 }
+                // TODO for binary page, if no content title in response, use filename (if known)
+
+                response.setConversionDuration(new Date().getTime() - convertStart);
             }
         }
         catch (IOException e)

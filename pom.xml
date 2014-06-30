@@ -5,7 +5,7 @@
 	<groupId>com.codealot.url2text</groupId>
 	<artifactId>url2text-parent</artifactId>
 	<packaging>pom</packaging>
-	<version>1.1.0</version>
+	<version>1.1.1</version>
 	<name>Url2Text</name>
 	<description>Url2Text - Convert (almost) any URL to text</description>
 
@@ -44,7 +44,7 @@
 
 	<properties>
 		<!-- System properties -->
-		<url2text.version>1.1.0</url2text.version>
+		<url2text.version>1.1.1</url2text.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
@@ -56,7 +56,7 @@
 		<junit.version>4.11</junit.version>
 		<slf4j.version>1.7.7</slf4j.version>
 		<tika.version>1.5</tika.version>
-		<htmlunit.version>2.14</htmlunit.version>
+		<htmlunit.version>2.15</htmlunit.version>
 	</properties>
 
 	<dependencyManagement>

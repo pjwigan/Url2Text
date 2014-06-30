@@ -4,7 +4,7 @@
   <parent>
     <groupId>com.codealot.url2text</groupId>
     <artifactId>url2text-parent</artifactId>
-    <version>1.1.0</version>
+    <version>1.1.1</version>
   </parent>
   
   <artifactId>url2text-core</artifactId>
