@@ -215,6 +215,7 @@ public class Url2TextFetchTextTest
         {
             assertEquals(200, response.getStatus());
             assertTrue(response.getText().contains("The date and time are:"));
+            assertEquals(response.getContentTitle(), "Page Title");
         }
     }
 

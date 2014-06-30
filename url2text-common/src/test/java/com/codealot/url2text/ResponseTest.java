@@ -225,6 +225,22 @@ public class ResponseTest
         }
     }
 
+    @Test
+    public void testSetContentTitle() throws IOException
+    {
+        try (final Response response = new Response())
+        {
+            // check initially STR_NOT_SET, then "", then "value".
+            assertEquals(STR_NOT_SET, response.getContentTitle());
+            response.setContentTitle(null);
+            assertEquals("", response.getContentTitle());
+            response.setContentTitle("");
+            assertEquals("", response.getContentTitle());
+            response.setContentTitle("value");
+            assertEquals("value", response.getContentTitle());
+        }
+    }
+
     @Test(expected = IllegalArgumentException.class)
     public void testSetFetchTimeNegative() throws IOException
     {
